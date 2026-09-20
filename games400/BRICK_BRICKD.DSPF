@@ -1,0 +1,153 @@
+     A*%%TS  SD  19980911  143931  WMBEPEO     REL-V4R2M0  5769-PW1
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03(33 'AVSLUTA')
+     A                                      CF12(32 'FÖREG BILD')
+     A          R REC1
+     A*%%TS  SD  19980911  143931  WMBEPEO     REL-V4R2M0  5769-PW1
+     A                                      RTNCSRLOC(&CR &CF &CP)
+     A                                      PUTOVR
+     A                                      OVERLAY
+     A            CR            10A  H
+     A            CF            10A  H
+     A            CP             4S 0H
+     A            A01            1A  P
+     A            A02            1A  P
+     A            A03            1A  P
+     A            A04            1A  P
+     A            A05            1A  P
+     A            A06            1A  P
+     A            A07            1A  P
+     A            A08            1A  P
+     A            A09            1A  P
+     A            A10            1A  P
+     A            A11            1A  P
+     A            A12            1A  P
+     A            A13            1A  P
+     A            A14            1A  P
+     A            A15            1A  P
+     A            A16            1A  P
+     A            MESS          70A  O  5  6COLOR(WHT)
+     A                                      OVRDTA
+     A                                  8 29'                       '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A                                  9 29'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A            F01            3A  B  9 33OVRDTA
+     A  01                                  DSPATR(PR)
+     A                                      DSPATR(&A01)
+     A  17                                  DSPATR(PC)
+     A            F02            3A  B  9 37OVRDTA
+     A  02                                  DSPATR(PR)
+     A                                      DSPATR(&A02)
+     A  18                                  DSPATR(PC)
+     A            F03            3A  B  9 41OVRDTA
+     A  03                                  DSPATR(PR)
+     A  19                                  DSPATR(PC)
+     A                                      DSPATR(&A03)
+     A            F04            3A  B  9 45OVRDTA
+     A  04                                  DSPATR(PR)
+     A                                      DSPATR(&A04)
+     A  20                                  DSPATR(PC)
+     A                                  9 49'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A                                 10 29'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A                                 10 49'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A                                 11 29'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A            F05            3A  B 11 33OVRDTA
+     A  05                                  DSPATR(PR)
+     A                                      DSPATR(&A05)
+     A  21                                  DSPATR(PC)
+     A            F06            3A  B 11 37OVRDTA
+     A  06                                  DSPATR(PR)
+     A                                      DSPATR(&A06)
+     A  22                                  DSPATR(PC)
+     A            F07            3A  B 11 41OVRDTA
+     A  07                                  DSPATR(PR)
+     A                                      DSPATR(&A07)
+     A  23                                  DSPATR(PC)
+     A            F08            3A  B 11 45OVRDTA
+     A  08                                  DSPATR(PR)
+     A                                      DSPATR(&A08)
+     A  24                                  DSPATR(PC)
+     A                                 11 49'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A                                 12 29'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A                                 12 49'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A                                 13 29'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A            F09            3A  B 13 33OVRDTA
+     A  09                                  DSPATR(PR)
+     A                                      DSPATR(&A09)
+     A  25                                  DSPATR(PC)
+     A            F10            3A  B 13 37OVRDTA
+     A  10                                  DSPATR(PR)
+     A                                      DSPATR(&A10)
+     A  26                                  DSPATR(PC)
+     A            F11            3A  B 13 41OVRDTA
+     A  11                                  DSPATR(PR)
+     A                                      DSPATR(&A11)
+     A  27                                  DSPATR(PC)
+     A            F12            3A  B 13 45OVRDTA
+     A  12                                  DSPATR(PR)
+     A                                      DSPATR(&A12)
+     A  28                                  DSPATR(PC)
+     A                                 13 49'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A                                 14 29'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A                                 14 49'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A                                 15 29'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A            F13            3A  B 15 33OVRDTA
+     A  13                                  DSPATR(PR)
+     A                                      DSPATR(&A13)
+     A  29                                  DSPATR(PC)
+     A            F14            3A  B 15 37OVRDTA
+     A  14                                  DSPATR(PR)
+     A                                      DSPATR(&A14)
+     A  30                                  DSPATR(PC)
+     A            F15            3A  B 15 41OVRDTA
+     A  15                                  DSPATR(PR)
+     A                                      DSPATR(&A15)
+     A  31                                  DSPATR(PC)
+     A            F16            3A  B 15 45OVRDTA
+     A  16                                  DSPATR(PR)
+     A                                      DSPATR(&A16)
+     A  32                                  DSPATR(PC)
+     A                                 15 49'   '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A                                 16 29'                       '
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A                                 19 24'Place Your Cursor and press Enter.'
+     A                                      COLOR(BLU)
+     A                                 20 24'You can move a whole row or just  '
+     A                                      COLOR(BLU)
+     A                                 21 24'parts of it!                      '
+     A                                      COLOR(BLU)
+     A                                 24  3'F3=Exit'
+     A                                      COLOR(BLU)

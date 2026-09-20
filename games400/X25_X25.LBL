@@ -1,0 +1,177 @@
+       IDENTIFICATION DIVISION.
+      *****************************************************************
+      *  X25 - Simple game for bored AS400 users                      *
+      *---------------------------------------------------------------*
+      *  COMPILER:  Cobol/400                                         *
+      *                                                               *
+      *  AUTHOR:    Ales Linda   (e-mail: linda@its.cz)               *
+      *                                                               *
+      *  DESCR.:    Numbers 1 to 24 are shuffled in 5x5 table on      *
+      *             the screen, Player can move them using numeric    *
+      *             keys 1,2,3,5. The goal is to sort them into       *
+      *             right order. You can use SPACE key or Enter in    *
+      *             the case when your boss is coming.                *
+      *                                                               *
+      *****************************************************************
+       PROGRAM-ID. X25.
+       AUTHOR. ALES LINDA.
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-AS400.
+       OBJECT-COMPUTER. IBM-AS400.
+       SPECIAL-NAMES.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+            SELECT WS ASSIGN TO WORKSTATION-X25W
+                 ORGANIZATION IS TRANSACTION
+                 ACCESS  MODE IS SEQUENTIAL
+                 CONTROL-AREA IS WS-CONTROL.
+       DATA DIVISION.
+       FILE SECTION.
+       FD  WS.
+       01  WS-REC PIC X(1800).
+       WORKING-STORAGE SECTION.
+       01  X25W01-O-FORMAT.
+           COPY DDS-X25W01-O OF X25W.
+       01  WS-REC01 REDEFINES X25W01-O-FORMAT.
+           03 WS-VOLBA     PIC X.
+           03 WS-TABLE1.
+              05 WS-ROW OCCURS 5.
+                 07 WS-CHAR  OCCURS 5  PIC XX.
+           03 WS-MSG    PIC X(75).
+       01  X25W01-I-FORMAT.
+           COPY DDS-X25W01-I OF X25W.
+       01  X25W02-O-FORMAT.
+           COPY DDS-X25W02-O OF X25W.
+       01  X25W02-I-FORMAT.
+           COPY DDS-X25W02-I OF X25W.
+
+       01  INDICATOR-AREA.
+           05 IN03        PIC 1 INDIC 03.
+              88 CMD3         VALUE B"1".
+           05 IN05        PIC 1 INDIC 05.
+              88 CMD5         VALUE B"1".
+           05 IN12        PIC 1 INDIC 12.
+              88 CMD12        VALUE B"1".
+       01  WS-CONTROL.
+           05 BEF-TASTEN           PIC XX.
+              88 DOPR              VALUE "05".
+           05 WKST-ID              PIC X(10) VALUE SPACES.
+           05 REC-FMT              PIC X(10) VALUE SPACES.
+       77  X           PIC S99.
+       77  Y           PIC S99.
+       77  R           PIC S99.
+       77  S           PIC S99.
+       77  P           PIC S99.
+       77  ZPRAVA      PIC 9.
+       77  SHOW        PIC 9.
+       77  POMER1      PIC S999V9999.
+       77  POMER2      PIC S999V9999.
+       01  POMER3      PIC S999V9999.
+       01  POMER3R REDEFINES POMER3.
+           03  FILLER   PIC X(6).
+           03  CISLO    PIC 9.
+       01  TIM.
+           03 TIM-HH    PIC 99.
+           03 TIM-MM    PIC 99.
+           03 TIM-SS    PIC 99.
+       PROCEDURE DIVISION.
+       MAIN SECTION.
+       BEGIN.
+           OPEN I-O WS.
+           PERFORM FILL-FIELDS.
+       LOOP.
+           MOVE SPACE TO VOLBA OF X25W01-O.
+           MOVE SPACE TO WS-CHAR(R S).
+           PERFORM COMPARE.
+           PERFORM WR-SCREEN.
+           IF CMD3 OR CMD12 GO TO ENDING.
+           IF CMD5 PERFORM FILL-FIELDS GO TO LOOP.
+           IF VOLBA OF X25W01-O = " " PERFORM BOSS-KEY GO TO LOOP.
+           IF VOLBA OF X25W01-O = "1" PERFORM MOV-LEFT GO TO LOOP.
+           IF VOLBA OF X25W01-O = "3" PERFORM MOV-RIGHT GO TO LOOP.
+           IF VOLBA OF X25W01-O = "2" PERFORM MOV-DOWN GO TO LOOP.
+           IF VOLBA OF X25W01-O = "5" PERFORM MOV-UP GO TO LOOP.
+           GO TO LOOP.
+       ENDING.
+           CLOSE WS.
+           STOP RUN.
+      * ===============================================================
+       FILL-FIELDS SECTION.
+       FF. INITIALIZE WS-REC01.
+           MOVE ZERO TO ZPRAVA SHOW.
+           MOVE "0102030405" TO WS-ROW(1).
+           MOVE "0607080910" TO WS-ROW(2).
+           MOVE "1112131415" TO WS-ROW(3).
+           MOVE "1617181920" TO WS-ROW(4).
+           MOVE "21222324  " TO WS-ROW(5).
+           MOVE 5 TO R.
+           MOVE 5 TO S.
+           PERFORM SHUFFLING VARYING X FROM 1 BY 1 UNTIL X > 20.
+      * ---------------------------------------------------------------
+       MOV-LEFT SECTION.
+       ML. IF S NOT = 5
+                COMPUTE P = S + 1
+                MOVE WS-CHAR(R P) TO WS-CHAR(R S)
+                MOVE P TO S.
+      * ---------------------------------------------------------------
+       MOV-RIGHT SECTION.
+       MR. IF S NOT = 1
+                COMPUTE P = S - 1
+                MOVE WS-CHAR(R P) TO WS-CHAR(R S)
+                MOVE P TO S.
+      * ---------------------------------------------------------------
+       MOV-DOWN SECTION.
+       MD. IF R NOT = 1
+                COMPUTE P = R - 1
+                MOVE WS-CHAR(P S) TO WS-CHAR(R S)
+                MOVE P TO R.
+      * ---------------------------------------------------------------
+       MOV-UP SECTION.
+       MU. IF R NOT = 5
+                COMPUTE P = R + 1
+                MOVE WS-CHAR(P S) TO WS-CHAR(R S)
+                MOVE P TO R.
+      * ---------------------------------------------------------------
+       COMPARE SECTION.
+       CMP.
+           IF WS-ROW(1) NOT = "0102030405" GO TO CMP-EX.
+           IF WS-ROW(2) NOT = "0607080910" GO TO CMP-EX.
+           IF WS-ROW(3) NOT = "1112131415" GO TO CMP-EX.
+           IF WS-ROW(4) NOT = "1617181920" GO TO CMP-EX.
+           IF WS-ROW(5) NOT = "21222324  " GO TO CMP-EX.
+           MOVE "OK - GOOD WORK - GAME OVER" TO WS-MSG.
+       CMP-EX. EXIT.
+      * ---------------------------------------------------------------
+       SHUFFLING SECTION.
+       SH. MOVE ZERO TO Y.
+           ACCEPT TIM FROM TIME.
+       SH1.
+           ADD 1 TO Y.
+           IF Y > 79 GO TO SH-EX.
+           COMPUTE POMER1 = (X + TIM-MM + TIM-SS + TIM-HH) / 13.
+           COMPUTE POMER2 = (Y + TIM-MM + TIM-SS + TIM-HH) / 17.
+           COMPUTE POMER3 = POMER1 / POMER2.
+           IF CISLO < 3 PERFORM MOV-LEFT.
+           IF CISLO = 3 OR 4 PERFORM MOV-RIGHT.
+           IF CISLO = 5 OR 6 PERFORM MOV-DOWN.
+           IF CISLO > 6 PERFORM MOV-UP.
+           MOVE SPACE TO WS-CHAR(R S).
+           GO TO SH1.
+       SH-EX. EXIT.
+      * ---------------------------------------------------------------
+       WR-SCREEN SECTION.
+       WRITE-OBR.
+           WRITE WS-REC FROM X25W01-O-FORMAT FORMAT IS "X25W01".
+       READ-OBR.
+           READ WS INTO X25W01-I-FORMAT.
+           MOVE CORR X25W01-I-INDIC TO INDICATOR-AREA.
+           MOVE CORR X25W01-I TO X25W01-O.
+      * ---------------------------------------------------------------
+       BOSS-KEY SECTION.
+       WRITE-OB2.
+           WRITE WS-REC FROM X25W02-O-FORMAT FORMAT IS "X25W02".
+           READ WS INTO X25W02-I-FORMAT.
+           MOVE CORR X25W02-I-INDIC TO INDICATOR-AREA.
+           IF CMD3 OR CMD12 GO TO ENDING.
+      * ----End of source---------------------------------------------*

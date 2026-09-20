@@ -1,0 +1,162 @@
+     A*%%TS  SD  19980616  180121  MINSKRPG    REL-V2R2M0  5738-PW1
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      MSGLOC(24)
+     A                                      CF03
+     A                                      CF05
+     A                                      CF06
+     A                                      CF07
+     A                                      CF08
+     A                                      CF09
+     A                                      CF12
+     A*============================================================
+     A          R V200
+     A*%%TS  SD  19980615  101335  MINSKRPG    REL-V2R2M0  5738-PW1
+     A                                      TEXT('Main fmt')
+     A                                      PUTOVR
+     A  50                                  INVITE
+     A                                  1 30'Super AS/400 tetris'
+     A                                      COLOR(WHT)
+     A            $$OALL        21A  B  2 29
+     A                                      OVRDTA
+     A                                      COLOR(WHT)
+     A                                  3 30'SCORE:'
+     A                                      COLOR(BLU)
+     A            $$OSCR         5Y 0O  3 40
+     A  60                                  OVRDTA
+     A                                      COLOR(BLU)
+     A                                      EDTCDE(3)
+     A                                  6  1'Record:'
+     A                                      COLOR(BLU)
+     A            $$RECR         5Y 0O  6  9
+     A  59                                  OVRDTA
+     A                                      COLOR(BLU)
+     A                                      EDTCDE(3)
+     A                                  7  3'From:'
+     A                                      COLOR(BLU)
+     A            $$FROM        21   O  8  1
+     A  59                                  OVRDTA
+     A                                      COLOR(BLU)
+     A                                  9  3'Owned by:'
+     A                                      COLOR(BLU)
+     A            $$NAME        20A  O 10  1
+     A  59                                  OVRDTA
+     A                                      COLOR(BLU)
+     A            $$O01         30A  O  5 26
+     A  61                                  OVRDTA
+     A            $$O02         30A  O  6 26
+     A  62                                  OVRDTA
+     A            $$O03         30A  O  7 26
+     A  63                                  OVRDTA
+     A            $$O04         30A  O  8 26
+     A  64                                  OVRDTA
+     A            $$O05         30A  O  9 26
+     A  65                                  OVRDTA
+     A            $$O06         30A  O 10 26
+     A  66                                  OVRDTA
+     A            $$O07         30A  O 11 26
+     A  67                                  OVRDTA
+     A            $$O08         30A  O 12 26
+     A  68                                  OVRDTA
+     A            $$O09         30A  O 13 26
+     A  69                                  OVRDTA
+     A            $$O10         30A  O 14 26
+     A  70                                  OVRDTA
+     A            $$O11         30A  O 15 26
+     A  71                                  OVRDTA
+     A            $$O12         30A  O 16 26
+     A  72                                  OVRDTA
+     A            $$O13         30A  O 17 26
+     A  73                                  OVRDTA
+     A            $$O14         30A  O 18 26
+     A  74                                  OVRDTA
+     A            $$O15         30A  O 19 26
+     A  75                                  OVRDTA
+     A            $$O16         30A  O 20 26
+     A  76                                  OVRDTA
+     A            $$O17         30A  O 21 26
+     A  77                                  OVRDTA
+     A            $$O18         30A  O 22 26
+     A  78                                  OVRDTA
+     A                                  5 24'³'
+     A                                  5 57'³'
+     A                                  6 24'³'
+     A                                  6 57'³'
+     A                                  7 24'³'
+     A                                  7 57'³'
+     A                                  8 24'³'
+     A                                  8 57'³'
+     A                                  9 24'³'
+     A                                  9 57'³'
+     A                                 10 24'³'
+     A                                 10 57'³'
+     A                                 11 24'³'
+     A                                 11 57'³'
+     A                                 12 24'³'
+     A                                 12 57'³'
+     A                                 13 24'³'
+     A                                 13 57'³'
+     A                                 14 24'³'
+     A                                 14 57'³'
+     A                                 15 24'³'
+     A                                 15 57'³'
+     A                                 16 24'³'
+     A                                 16 57'³'
+     A                                 17 24'³'
+     A                                 17 57'³'
+     A                                 18 24'³'
+     A                                 18 57'³'
+     A                                 19 24'³'
+     A                                 19 57'³'
+     A                                 20 24'³'
+     A                                 20 57'³'
+     A                                 21 24'³'
+     A                                 21 57'³'
+     A                                 22 24'³'
+     A                                 22 57'³'
+     A                                 23 24'³--------------------------------³'
+     A                                 20  1'F12-Reset'
+     A                                      COLOR(WHT)
+     A                                 22  1'F3-Exit'
+     A                                      COLOR(WHT)
+     A                                 15 67'F6-Left'
+     A                                      COLOR(WHT)
+     A                                 18 67'F7-Right'
+     A                                      COLOR(WHT)
+     A                                 11 67'Enter-Drop'
+     A                                      COLOR(WHT)
+     A                                 13 67'F9-Rotate'
+     A                                      COLOR(WHT)
+     A                                 16 67'F5-Left max'
+     A                                      COLOR(WHT)
+     A                                 19 67'F8-Right max'
+     A                                      COLOR(WHT)
+     A*============================================================
+     A          R VBYE
+     A*%%TS  SD  19980611  102042  MINSKRPG    REL-V2R2M0  5738-PW1
+     A                                      TEXT('Bye fmt')
+     A                                      OVERLAY
+     A                                      WINDOW(12 32 3 10)
+     A                                  2  2'Good Bye|'
+     A                                      COLOR(RED)
+     A*============================================================
+     A          R VREC
+     A*%%TS  SD  19980612  140021  MINSKRPG    REL-V2R2M0  5738-PW1
+     A                                      TEXT('Record fmt')
+     A                                      OVERLAY
+     A                                      WINDOW(12 10 5 60)
+     A                                  1  9'Your result is greather than previ-
+     A                                      ous record|'
+     A                                      COLOR(BLU)
+     A                                  2 13'Please, enter your name for histor-
+     A                                      y:'
+     A                                      COLOR(BLU)
+     A            $$INAM        20   I  4 21CHECK(LC)
+     A*============================================================
+     A          R VLAT
+     A*%%TS  SD  19980616  180121  MINSKRPG    REL-V2R2M0  5738-PW1
+     A                                      WINDOW(14 15 3 50)
+     A                                      TEXT('Record fmt')
+     A                                      OVERLAY
+     A                                  2 16'Sorry, You are late..'
+     A                                      COLOR(BLU)

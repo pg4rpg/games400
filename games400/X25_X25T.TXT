@@ -1,0 +1,19 @@
+Name:		X25
+
+Author:         Linda Ales (linda@its.cz)
+
+Objects:	X25W	        Display file
+                X25		COBOL/400 Program
+
+To Create:      Compile the display file X25W first, and then COBOL/400
+                program X25.
+
+Object:	        The object of the X25 game is to arrange the numbers in a
+		pattern from 1-24 from left to right, top to bottom.
+
+To Start:	CALL X25
+
+Play:		You can only move numbers that are adjacent to the blank space.
+		Use numeric keys 1,2,3,5 to move a number into the blank space.
+		'1' = Right, '2' = Down, '3' = Left, and '5' = Up.
+		Enter and space activate a dummy WRKSPLF command (the Boss key).

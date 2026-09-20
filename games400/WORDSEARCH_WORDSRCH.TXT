@@ -1,0 +1,18 @@
+Name:		Word Search
+
+Author:         Shankar Narayan (Shankar@aimcornet.com)
+
+Objects:        WRDSCHD		Display file
+                WRDSCHR       	RPG/400 Program
+
+To Create:      Compile the display file WRDSCHD first, and then RPG/400 program
+		WRDSCHR.
+
+Object:	        Create your own word search by placing letters in the grid and t
+		having the AS/400 search for word patterns.
+
+To Start:	CALL WRDSCHR
+
+Play:		Fill the grid with letters, and use the F6 key to search for patterns
+		of letters.
+

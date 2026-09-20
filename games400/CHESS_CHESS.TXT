@@ -1,0 +1,11 @@
+Name:  		Chess/400
+Author:  Steve Allen (steve_d_allen@yahoo.com)
+------------------------------------------------------------
+Dies ist ein Schachspiel, bei dem Ihr gegen einen anderen
+Benutzer auf der AS/400 spielen k¦nnt.
+Play:   	Move your pieces by specifying the 'from' location and
+		the 'to' location on the command line.
+		Ex:  E2 E3 would move the pawn at grid point E2 to grid point E3.
+		The game does not check for illegal moves, and will not designate
+		a check or checkmate.  It is played against an opponent, and is
+		meant to be played serially over a long period of time.

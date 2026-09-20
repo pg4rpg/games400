@@ -1,0 +1,19 @@
+/* CL program:  ZZn007001                                                     */
+/* Description: Compiles the code uploaded from file n007001.bdl              */
+/*              'Brick-a-Spell'                                               */
+
+PGM
+
+    MONMSG  CPF0000  EXEC(GOTO ERRPRC)
+
+    CRTDSPF FILE(GAMES400/BRICKD) SRCFILE(GAMES400/N007001)
+    MONMSG CPF0000
+
+    CRTRPGPGM PGM(GAMES400/BRICKR) SRCFILE(GAMES400/N007001) SRCMBR(BRICKR)
+    MONMSG CPF0000
+
+    RETURN
+
+ERRPRC:
+    DMPCLPGM
+ENDPGM

@@ -1,0 +1,608 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR RI))
+     A                                      CA03(70 'AVSLUTA')
+     A                                      CA12(71 'FÖREG BILD')
+     A                                      CA24(72 'SAVE')
+     A          R WBILD1
+     A                                      WINDOW(WDWFTR)
+     A                                      RTNCSRLOC(&CR &CF &CP)
+     A  99                                  LOCK
+     A                                      PUTOVR
+     A                                      FRCDTA
+     A                                      KEEP
+     A                                      OVERLAY
+     A            A01            1A  P
+     A            A02            1A  P
+     A            A03            1A  P
+     A            A04            1A  P
+     A            A05            1A  P
+     A            A06            1A  P
+     A            A07            1A  P
+     A            A08            1A  P
+     A            A09            1A  P
+     A            A10            1A  P
+     A            A11            1A  P
+     A            A12            1A  P
+     A            A13            1A  P
+     A            A14            1A  P
+     A            A15            1A  P
+     A            A16            1A  P
+     A            A17            1A  P
+     A            A18            1A  P
+     A            A19            1A  P
+     A            A20            1A  P
+     A            A21            1A  P
+     A            A22            1A  P
+     A            A23            1A  P
+     A            A24            1A  P
+     A            A25            1A  P
+     A            A26            1A  P
+     A            A27            1A  P
+     A            A28            1A  P
+     A            A29            1A  P
+     A            A30            1A  P
+     A            A31            1A  P
+     A            A32            1A  P
+     A            A33            1A  P
+     A            A34            1A  P
+     A            A35            1A  P
+     A            A36            1A  P
+     A            A37            1A  P
+     A            A38            1A  P
+     A            A39            1A  P
+     A            A40            1A  P
+     A            A41            1A  P
+     A            A42            1A  P
+     A            A43            1A  P
+     A            A44            1A  P
+     A            A45            1A  P
+     A            A46            1A  P
+     A            A47            1A  P
+     A            A48            1A  P
+     A            A49            1A  P
+     A            A50            1A  P
+     A            A51            1A  P
+     A            A52            1A  P
+     A            A53            1A  P
+     A            A54            1A  P
+     A            A55            1A  P
+     A            A56            1A  P
+     A            A57            1A  P
+     A            A58            1A  P
+     A            A59            1A  P
+     A            A60            1A  P
+     A            A61            1A  P
+     A            A62            1A  P
+     A            A63            1A  P
+     A            A64            1A  P
+     A            AX             1A  P
+     A            AO             1A  P
+     A            CR            10A  H
+     A            CF            10A  H
+     A            CP             4S 0H
+     A            MEDD          42A  O  2  1COLOR(WHT)
+     A                                      OVRDTA
+     A                                  3 16'                          '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A                                  4 16' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A            F01            1A  B  4 18CHGINPDFT
+     A                                      OVRDTA
+     A  01                                  DSPATR(PR)
+     A N01                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A01)
+     A            F02            1A  B  4 21CHGINPDFT
+     A                                      OVRDTA
+     A  02                                  DSPATR(PR)
+     A N02                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A02)
+     A            F03            1A  B  4 24CHGINPDFT
+     A                                      OVRDTA
+     A  03                                  DSPATR(PR)
+     A N03                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A03)
+     A            F04            1A  B  4 27CHGINPDFT
+     A                                      OVRDTA
+     A  04                                  DSPATR(PR)
+     A N04                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A04)
+     A            F05            1A  B  4 30CHGINPDFT
+     A                                      OVRDTA
+     A  05                                  DSPATR(PR)
+     A N05                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A05)
+     A            F06            1A  B  4 33CHGINPDFT
+     A                                      OVRDTA
+     A  06                                  DSPATR(PR)
+     A N06                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A06)
+     A            F07            1A  B  4 36CHGINPDFT
+     A                                      OVRDTA
+     A  07                                  DSPATR(PR)
+     A N07                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A07)
+     A            F08            1A  B  4 39CHGINPDFT
+     A                                      OVRDTA
+     A  08                                  DSPATR(PR)
+     A N08                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A08)
+     A                                  4 41' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A                                  5 16' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A            F09            1A  B  5 18CHGINPDFT
+     A                                      OVRDTA
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A09)
+     A            F10            1A  B  5 21CHGINPDFT
+     A                                      OVRDTA
+     A  10                                  DSPATR(PR)
+     A N10                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A10)
+     A            F11            1A  B  5 24CHGINPDFT
+     A                                      OVRDTA
+     A  11                                  DSPATR(PR)
+     A N11                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A11)
+     A            F12            1A  B  5 27CHGINPDFT
+     A                                      OVRDTA
+     A  12                                  DSPATR(PR)
+     A N12                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A12)
+     A            F13            1A  B  5 30CHGINPDFT
+     A                                      OVRDTA
+     A  13                                  DSPATR(PR)
+     A N13                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A13)
+     A            F14            1A  B  5 33CHGINPDFT
+     A                                      OVRDTA
+     A  14                                  DSPATR(PR)
+     A N14                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A14)
+     A            F15            1A  B  5 36CHGINPDFT
+     A                                      OVRDTA
+     A  15                                  DSPATR(PR)
+     A N15                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A15)
+     A            F16            1A  B  5 39CHGINPDFT
+     A                                      OVRDTA
+     A  16                                  DSPATR(PR)
+     A N16                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A16)
+     A                                  5 41' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A            DUX            1A  O  6  1OVRDTA
+     A                                      DSPATR(&AX)
+     A                                  6  3'(You)....'
+     A                                      COLOR(BLU)
+     A            DU             2Y 0O  6 13EDTCDE(Z)
+     A                                      OVRDTA
+     A                                      COLOR(RED)
+     A                                  6 16' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A            F17            1A  B  6 18CHGINPDFT
+     A                                      OVRDTA
+     A  17                                  DSPATR(PR)
+     A N17                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A17)
+     A            F18            1A  B  6 21CHGINPDFT
+     A                                      OVRDTA
+     A  18                                  DSPATR(PR)
+     A N18                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A18)
+     A            F19            1A  B  6 24CHGINPDFT
+     A                                      OVRDTA
+     A  19                                  DSPATR(PR)
+     A N19                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A19)
+     A            F20            1A  B  6 27CHGINPDFT
+     A                                      OVRDTA
+     A  20                                  DSPATR(PR)
+     A N20                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A20)
+     A            F21            1A  B  6 30CHGINPDFT
+     A                                      OVRDTA
+     A  21                                  DSPATR(PR)
+     A N21                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A21)
+     A            F22            1A  B  6 33CHGINPDFT
+     A                                      OVRDTA
+     A  22                                  DSPATR(PR)
+     A N22                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A22)
+     A            F23            1A  B  6 36CHGINPDFT
+     A                                      OVRDTA
+     A  23                                  DSPATR(PR)
+     A N23                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A23)
+     A            F24            1A  B  6 39CHGINPDFT
+     A                                      OVRDTA
+     A  24                                  DSPATR(PR)
+     A N24                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A24)
+     A                                  6 41' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A                                  7 16' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A            F25            1A  B  7 18CHGINPDFT
+     A                                      OVRDTA
+     A  25                                  DSPATR(PR)
+     A N25                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A25)
+     A            F26            1A  B  7 21CHGINPDFT
+     A                                      OVRDTA
+     A  26                                  DSPATR(PR)
+     A N26                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A26)
+     A            F27            1A  B  7 24CHGINPDFT
+     A                                      OVRDTA
+     A  27                                  DSPATR(PR)
+     A N27                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A27)
+     A            F28            1A  B  7 27CHGINPDFT
+     A                                      OVRDTA
+     A  28                                  DSPATR(PR)
+     A N28                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A28)
+     A            F29            1A  B  7 30CHGINPDFT
+     A                                      OVRDTA
+     A  29                                  DSPATR(PR)
+     A N29                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A29)
+     A            F30            1A  B  7 33CHGINPDFT
+     A                                      OVRDTA
+     A  30                                  DSPATR(PR)
+     A N30                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A30)
+     A            F31            1A  B  7 36CHGINPDFT
+     A                                      OVRDTA
+     A  31                                  DSPATR(PR)
+     A N31                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A31)
+     A            F32            1A  B  7 39CHGINPDFT
+     A                                      OVRDTA
+     A  32                                  DSPATR(PR)
+     A N32                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A32)
+     A                                  7 41' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A            DAO            1A  O  8  1OVRDTA
+     A                                      DSPATR(&AO)
+     A                                  8  3'(AS/400).'
+     A                                      COLOR(BLU)
+     A            DA             2Y 0O  8 13EDTCDE(Z)
+     A                                      OVRDTA
+     A                                      COLOR(RED)
+     A                                  8 16' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A            F33            1A  B  8 18CHGINPDFT
+     A                                      OVRDTA
+     A  33                                  DSPATR(PR)
+     A N33                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A33)
+     A            F34            1A  B  8 21CHGINPDFT
+     A                                      OVRDTA
+     A  34                                  DSPATR(PR)
+     A N34                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A34)
+     A            F35            1A  B  8 24CHGINPDFT
+     A                                      OVRDTA
+     A  35                                  DSPATR(PR)
+     A N35                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A35)
+     A            F36            1A  B  8 27CHGINPDFT
+     A                                      OVRDTA
+     A  36                                  DSPATR(PR)
+     A N36                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A36)
+     A            F37            1A  B  8 30CHGINPDFT
+     A                                      OVRDTA
+     A  37                                  DSPATR(PR)
+     A N37                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A37)
+     A            F38            1A  B  8 33CHGINPDFT
+     A                                      OVRDTA
+     A  38                                  DSPATR(PR)
+     A N38                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A38)
+     A            F39            1A  B  8 36CHGINPDFT
+     A                                      OVRDTA
+     A  39                                  DSPATR(PR)
+     A N39                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A39)
+     A            F40            1A  B  8 39CHGINPDFT
+     A                                      OVRDTA
+     A  40                                  DSPATR(PR)
+     A N40                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A40)
+     A                                  8 41' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A                                  9 16' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A            F41            1A  B  9 18CHGINPDFT
+     A                                      OVRDTA
+     A  41                                  DSPATR(PR)
+     A N41                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A41)
+     A            F42            1A  B  9 21CHGINPDFT
+     A                                      OVRDTA
+     A  42                                  DSPATR(PR)
+     A N42                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A42)
+     A            F43            1A  B  9 24CHGINPDFT
+     A                                      OVRDTA
+     A  43                                  DSPATR(PR)
+     A N43                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A43)
+     A            F44            1A  B  9 27CHGINPDFT
+     A                                      OVRDTA
+     A  44                                  DSPATR(PR)
+     A N44                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A44)
+     A            F45            1A  B  9 30CHGINPDFT
+     A                                      OVRDTA
+     A  45                                  DSPATR(PR)
+     A N45                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A45)
+     A            F46            1A  B  9 33CHGINPDFT
+     A                                      OVRDTA
+     A  46                                  DSPATR(PR)
+     A N46                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A46)
+     A            F47            1A  B  9 36CHGINPDFT
+     A                                      OVRDTA
+     A  47                                  DSPATR(PR)
+     A N47                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A47)
+     A            F48            1A  B  9 39CHGINPDFT
+     A                                      OVRDTA
+     A  48                                  DSPATR(PR)
+     A N48                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A48)
+     A                                  9 41' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A                                 10 16' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A            F49            1A  B 10 18CHGINPDFT
+     A                                      OVRDTA
+     A  49                                  DSPATR(PR)
+     A N49                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A49)
+     A            F50            1A  B 10 21CHGINPDFT
+     A                                      OVRDTA
+     A  50                                  DSPATR(PR)
+     A N50                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A50)
+     A            F51            1A  B 10 24CHGINPDFT
+     A                                      OVRDTA
+     A  51                                  DSPATR(PR)
+     A N51                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A51)
+     A            F52            1A  B 10 27CHGINPDFT
+     A                                      OVRDTA
+     A  52                                  DSPATR(PR)
+     A N52                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A52)
+     A            F53            1A  B 10 30CHGINPDFT
+     A                                      OVRDTA
+     A  53                                  DSPATR(PR)
+     A N53                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A53)
+     A            F54            1A  B 10 33CHGINPDFT
+     A                                      OVRDTA
+     A  54                                  DSPATR(PR)
+     A N54                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A54)
+     A            F55            1A  B 10 36CHGINPDFT
+     A                                      OVRDTA
+     A  55                                  DSPATR(PR)
+     A N55                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A55)
+     A            F56            1A  B 10 39CHGINPDFT
+     A                                      OVRDTA
+     A  56                                  DSPATR(PR)
+     A N56                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A56)
+     A                                 10 41' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A                                 11 16' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A            F57            1A  B 11 18CHGINPDFT
+     A                                      OVRDTA
+     A  57                                  DSPATR(PR)
+     A N57                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A57)
+     A            F58            1A  B 11 21CHGINPDFT
+     A                                      OVRDTA
+     A  58                                  DSPATR(PR)
+     A N58                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A58)
+     A            F59            1A  B 11 24CHGINPDFT
+     A                                      OVRDTA
+     A  59                                  DSPATR(PR)
+     A N59                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A59)
+     A            F60            1A  B 11 27CHGINPDFT
+     A                                      OVRDTA
+     A  60                                  DSPATR(PR)
+     A N60                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A60)
+     A            F61            1A  B 11 30CHGINPDFT
+     A                                      OVRDTA
+     A  61                                  DSPATR(PR)
+     A N61                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A61)
+     A            F62            1A  B 11 33CHGINPDFT
+     A                                      OVRDTA
+     A  62                                  DSPATR(PR)
+     A N62                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A62)
+     A            F63            1A  B 11 36CHGINPDFT
+     A                                      OVRDTA
+     A  63                                  DSPATR(PR)
+     A N63                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A63)
+     A            F64            1A  B 11 39CHGINPDFT
+     A                                      OVRDTA
+     A  64                                  DSPATR(PR)
+     A N64                                  DSPATR(ND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(&A64)
+     A                                 11 41' '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A                                 12 16'                          '
+     A                                      DSPATR(RI)
+     A                                      COLOR(WHT)
+     A          R DUMMY
+     A                                      ASSUME
+     A                                  1  2' '
+     A          R WDWFTR
+     A                                      WINDOW(6 18 14 42)
+     A                                      WDWBORDER((*COLOR BLU) (*CHAR '    -
+     A                                          '))
+     A                                 13  3'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 13 14'F12=Cancel'
+     A                                      COLOR(BLU)
+     A                                 13 28'F24=Save/Load'
+     A                                      COLOR(BLU)
+     A          R SAVE
+     A                                      WINDOW(WDWFTS)
+     A                                      KEEP
+     A                                      OVERLAY
+     A                                  2  2'      Number Name                 -
+     A                                            '
+     A                                      DSPATR(HI)
+     A                                      COLOR(BLU)
+     A                                      DSPATR(RI)
+     A            FNR1      R        O  3 12REFFLD(REC/FNR1 *LIBL/OTH400PF)
+     A                                      COLOR(PNK)
+     A            FNAM1     R        O  3 15REFFLD(REC/FNAM1 *LIBL/OTH400PF)
+     A                                      DSPATR(HI)
+     A            FNR2      R        O  4 12REFFLD(REC/FNR2 *LIBL/OTH400PF)
+     A                                      COLOR(PNK)
+     A            FNAM2     R        O  4 15REFFLD(REC/FNAM2 *LIBL/OTH400PF)
+     A                                      DSPATR(HI)
+     A            FNR3      R        O  5 12REFFLD(REC/FNR3 *LIBL/OTH400PF)
+     A                                      COLOR(PNK)
+     A            FNAM3     R        O  5 15REFFLD(REC/FNAM3 *LIBL/OTH400PF)
+     A                                      DSPATR(HI)
+     A            FNR4      R        O  6 12REFFLD(REC/FNR4 *LIBL/OTH400PF)
+     A                                      COLOR(PNK)
+     A            FNAM4     R        O  6 15REFFLD(REC/FNAM4 *LIBL/OTH400PF)
+     A                                      DSPATR(HI)
+     A            FNR5      R        O  7 12REFFLD(REC/FNR5 *LIBL/OTH400PF)
+     A                                      COLOR(PNK)
+     A            FNAM5     R        O  7 15REFFLD(REC/FNAM5 *LIBL/OTH400PF)
+     A                                      DSPATR(HI)
+     A                                  9  2' S/L....:'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(RI)
+     A            VAL1           1A  B  9 12
+     A  75                                  DSPATR(PR)
+     A                                  9 14' (Save or Load)             '
+     A                                      DSPATR(HI)
+     A                                      COLOR(BLU)
+     A                                      DSPATR(RI)
+     A  75                             10  2' Number.:'
+     A  75                                  DSPATR(HI)
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A  75        NR             1A  B 10 12
+     A  76                             11  2' Name...:'
+     A  76                                  DSPATR(HI)
+     A                                      DSPATR(RI)
+     A                                      COLOR(BLU)
+     A  76        BEN           27A  B 11 12CHECK(LC)
+     A  77                             12 12' You must type a VALID number| '
+     A                                      DSPATR(HI)
+     A                                      DSPATR(RI)
+     A                                      DSPATR(BL)
+     A          R WDWFTS
+     A                                      WINDOW(6 18 14 42)
+     A                                      WDWBORDER((*COLOR RED) (*CHAR '    -
+     A                                          '))
+     A                                 13 32'F12=Cancel'
+     A                                      COLOR(BLU)

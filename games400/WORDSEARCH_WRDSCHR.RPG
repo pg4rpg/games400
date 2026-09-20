@@ -1,0 +1,1036 @@
+     H*****************************************************************
+     H* Program Name :  WRDSCHR  ( Type - RPG )
+     H* Description  :  To Perform Word Search Using A Subfile With
+     H*                 Multiple Arrays
+     H* Written      :  N.Shankar.
+     H* Dated        :  19 th Jan. 1998.
+     H*****************************************************************
+     F*
+     F* Display File For Word Search
+     FWRDSCHD CF  E                    WORKSTN
+     F                                        RRN   KSFILE SUBFL
+     F*
+     E*****************************************************************
+     E*
+     E* 'Word' Array
+     E                    W          11  1
+     E*
+     E* 'Rows' Array
+     E                    R01        11  1
+     E                    R02        11  1
+     E                    R03        11  1
+     E                    R04        11  1
+     E                    R05        11  1
+     E                    R06        11  1
+     E                    R07        11  1
+     E                    R08        11  1
+     E                    R09        11  1
+     E                    R10        11  1
+     E                    R11        11  1
+     E*
+     E* 'Path' Array
+     E                    PATH       11  4
+     E*
+     E* 'Indicator' Array
+     E                    HIND       11  1
+     E*
+     I*****************************************************************
+     I*
+     I* Program Status Data Structure
+     IPGMDS      SDS
+     I                                        1  10 PGMNAM
+     I                                       37  390#PARMS
+     I                                      244 253 WSID
+     I                                      254 263 USERID
+     I                                      264 2690JOBNO
+     I*
+     I* Data Structure To Separate Time & Date
+     I            DS
+     I                                        1  140TIMDAT
+     I                                        1   60STIME
+     I                                        7  140SDATE
+     I*
+     I* Data Structure Mapped With The Screen I/O Fields
+     I            DS
+     I                                        1  11 FIELDS
+     I                                        1   1 FLD001
+     I                                        2   2 FLD002
+     I                                        3   3 FLD003
+     I                                        4   4 FLD004
+     I                                        5   5 FLD005
+     I                                        6   6 FLD006
+     I                                        7   7 FLD007
+     I                                        8   8 FLD008
+     I                                        9   9 FLD009
+     I                                       10  10 FLD010
+     I                                       11  11 FLD011
+     I*
+     I* Data Structure Mapped With The Hidden Indicator Fields
+     I            DS
+     I                                        1  11 HIND
+     I                                        1   1 HIND01
+     I                                        2   2 HIND02
+     I                                        3   3 HIND03
+     I                                        4   4 HIND04
+     I                                        5   5 HIND05
+     I                                        6   6 HIND06
+     I                                        7   7 HIND07
+     I                                        8   8 HIND08
+     I                                        9   9 HIND09
+     I                                       10  10 HIND10
+     I                                       11  11 HIND11
+     I*
+     I* Data Structure Mapped With 'R01' Array
+     I            DS
+     I                                        1  11 R01
+     I                                        1   1 R01C01
+     I                                        2   2 R01C02
+     I                                        3   3 R01C03
+     I                                        4   4 R01C04
+     I                                        5   5 R01C05
+     I                                        6   6 R01C06
+     I                                        7   7 R01C07
+     I                                        8   8 R01C08
+     I                                        9   9 R01C09
+     I                                       10  10 R01C10
+     I                                       11  11 R01C11
+     I*
+     I* Data Structure Mapped With 'R02' Array
+     I            DS
+     I                                        1  11 R02
+     I                                        1   1 R02C01
+     I                                        2   2 R02C02
+     I                                        3   3 R02C03
+     I                                        4   4 R02C04
+     I                                        5   5 R02C05
+     I                                        6   6 R02C06
+     I                                        7   7 R02C07
+     I                                        8   8 R02C08
+     I                                        9   9 R02C09
+     I                                       10  10 R02C10
+     I                                       11  11 R02C11
+     I*
+     I* Data Structure Mapped With 'R03' Array
+     I            DS
+     I                                        1  11 R03
+     I                                        1   1 R03C01
+     I                                        2   2 R03C02
+     I                                        3   3 R03C03
+     I                                        4   4 R03C04
+     I                                        5   5 R03C05
+     I                                        6   6 R03C06
+     I                                        7   7 R03C07
+     I                                        8   8 R03C08
+     I                                        9   9 R03C09
+     I                                       10  10 R03C10
+     I                                       11  11 R03C11
+     I*
+     I* Data Structure Mapped With 'R04' Array
+     I            DS
+     I                                        1  11 R04
+     I                                        1   1 R04C01
+     I                                        2   2 R04C02
+     I                                        3   3 R04C03
+     I                                        4   4 R04C04
+     I                                        5   5 R04C05
+     I                                        6   6 R04C06
+     I                                        7   7 R04C07
+     I                                        8   8 R04C08
+     I                                        9   9 R04C09
+     I                                       10  10 R04C10
+     I                                       11  11 R04C11
+     I*
+     I* Data Structure Mapped With 'R05' Array
+     I            DS
+     I                                        1  11 R05
+     I                                        1   1 R05C01
+     I                                        2   2 R05C02
+     I                                        3   3 R05C03
+     I                                        4   4 R05C04
+     I                                        5   5 R05C05
+     I                                        6   6 R05C06
+     I                                        7   7 R05C07
+     I                                        8   8 R05C08
+     I                                        9   9 R05C09
+     I                                       10  10 R05C10
+     I                                       11  11 R05C11
+     I*
+     I* Data Structure Mapped With 'R06' Array
+     I            DS
+     I                                        1  11 R06
+     I                                        1   1 R06C01
+     I                                        2   2 R06C02
+     I                                        3   3 R06C03
+     I                                        4   4 R06C04
+     I                                        5   5 R06C05
+     I                                        6   6 R06C06
+     I                                        7   7 R06C07
+     I                                        8   8 R06C08
+     I                                        9   9 R06C09
+     I                                       10  10 R06C10
+     I                                       11  11 R06C11
+     I*
+     I* Data Structure Mapped With 'R07' Array
+     I            DS
+     I                                        1  11 R07
+     I                                        1   1 R07C01
+     I                                        2   2 R07C02
+     I                                        3   3 R07C03
+     I                                        4   4 R07C04
+     I                                        5   5 R07C05
+     I                                        6   6 R07C06
+     I                                        7   7 R07C07
+     I                                        8   8 R07C08
+     I                                        9   9 R07C09
+     I                                       10  10 R07C10
+     I                                       11  11 R07C11
+     I*
+     I* Data Structure Mapped With 'R08' Array
+     I            DS
+     I                                        1  11 R08
+     I                                        1   1 R08C01
+     I                                        2   2 R08C02
+     I                                        3   3 R08C03
+     I                                        4   4 R08C04
+     I                                        5   5 R08C05
+     I                                        6   6 R08C06
+     I                                        7   7 R08C07
+     I                                        8   8 R08C08
+     I                                        9   9 R08C09
+     I                                       10  10 R08C10
+     I                                       11  11 R08C11
+     I*
+     I* Data Structure Mapped With 'R09' Array
+     I            DS
+     I                                        1  11 R09
+     I                                        1   1 R09C01
+     I                                        2   2 R09C02
+     I                                        3   3 R09C03
+     I                                        4   4 R09C04
+     I                                        5   5 R09C05
+     I                                        6   6 R09C06
+     I                                        7   7 R09C07
+     I                                        8   8 R09C08
+     I                                        9   9 R09C09
+     I                                       10  10 R09C10
+     I                                       11  11 R09C11
+     I*
+     I* Data Structure Mapped With 'R10' Array
+     I            DS
+     I                                        1  11 R10
+     I                                        1   1 R10C01
+     I                                        2   2 R10C02
+     I                                        3   3 R10C03
+     I                                        4   4 R10C04
+     I                                        5   5 R10C05
+     I                                        6   6 R10C06
+     I                                        7   7 R10C07
+     I                                        8   8 R10C08
+     I                                        9   9 R10C09
+     I                                       10  10 R10C10
+     I                                       11  11 R10C11
+     I*
+     I* Data Structure Mapped With 'R11' Array
+     I            DS
+     I                                        1  11 R11
+     I                                        1   1 R11C01
+     I                                        2   2 R11C02
+     I                                        3   3 R11C03
+     I                                        4   4 R11C04
+     I                                        5   5 R11C05
+     I                                        6   6 R11C06
+     I                                        7   7 R11C07
+     I                                        8   8 R11C08
+     I                                        9   9 R11C09
+     I                                       10  10 R11C10
+     I                                       11  11 R11C11
+     I*
+     I* Data Structure Showing The Position Split Of Array 'PATH'
+     I            DS
+     I                                        1   4 POS14
+     I                                        1   2 POS12
+     I                                        3   4 POS34
+     I*
+     C*****************************************************************
+     C*
+     C           *IN03     DOUEQ*ON                         Do
+     C*                                                     !
+     C                     WRITEFOOTER                      !
+     C                     EXFMTSUBCTL                      !
+     C           *IN03     IFEQ *ON                         ! Exit
+     C                     LEAVE                            !
+     C                     ENDIF                            !
+     C*                                                     !
+     C           *IN07     IFEQ *ON                         ! Reset Ind
+     C                     EXSR $RSTIN                      !
+     C                     ITER                             !
+     C                     ENDIF                            !
+     C*                                                     !
+     C           *IN06     IFEQ *ON                         !
+     C                     EXFMTREC2                        !
+     C           *IN12     IFEQ *OFF                        ! Cancel
+     C                     EXSR $LOADA                      !
+     C                     ENDIF                            !
+     C                     ENDIF                            !
+     C*                                                     !
+     C                     ENDDO                            Enddo
+     C*
+     C*
+     C                     MOVE '1'       *INLR
+     C                     RETRN
+     C*
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  $LOADA
+     C* Description     :  To Load The Arrays From The Subfile
+     C*****************************************************************
+     C*
+     C           $LOADA    BEGSR
+     C*
+     C           1         DO   MAX       RRN     20        Do
+     C*                                                     !
+     C           RRN       CHAINSUBFL                99     !
+     C           *IN99     IFEQ '1'                         ! If
+     C                     LEAVE                            ! !
+     C                     ENDIF                            ! Endif
+     C*                                                     !
+     C                     SELEC                            ! Selec
+     C           RRN       WHEQ 1                           ! !
+     C                     MOVEAFIELDS    R01               ! ! Row-1
+     C           RRN       WHEQ 2                           ! !
+     C                     MOVEAFIELDS    R02               ! ! Row-2
+     C           RRN       WHEQ 3                           ! !
+     C                     MOVEAFIELDS    R03               ! ! Row-3
+     C           RRN       WHEQ 4                           ! !
+     C                     MOVEAFIELDS    R04               ! ! Row-4
+     C           RRN       WHEQ 5                           ! !
+     C                     MOVEAFIELDS    R05               ! ! Row-5
+     C           RRN       WHEQ 6                           ! !
+     C                     MOVEAFIELDS    R06               ! ! Row-6
+     C           RRN       WHEQ 7                           ! !
+     C                     MOVEAFIELDS    R07               ! ! Row-7
+     C           RRN       WHEQ 8                           ! !
+     C                     MOVEAFIELDS    R08               ! ! Row-8
+     C           RRN       WHEQ 9                           ! !
+     C                     MOVEAFIELDS    R09               ! ! Row-9
+     C           RRN       WHEQ 10                          ! !
+     C                     MOVEAFIELDS    R10               ! ! Row-10
+     C           RRN       WHEQ 11                          ! !
+     C                     MOVEAFIELDS    R11               ! ! Row-11
+     C                     ENDSL                            ! Endsl
+     C*                                                     !
+     C                     ENDDO                            Enddo
+     C*
+     C                     EXSR $STRSC
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  $STRSC
+     C* Description     :  To Start Word Search In All The Arrays
+     C*****************************************************************
+     C*
+     C           $STRSC    BEGSR
+     C*
+     C*
+     C                     MOVEAWORD      W
+     C                     Z-ADD1         I       20
+     C*
+     C*          First Character Of The Input Word Cannot Be Blank
+     C           W,I       IFEQ ' '                           If
+     C                     GOTO $ENDSC                        !
+     C                     ENDIF                              Endif
+     C*
+     C*          Retrieve The Length Of The Input Word
+     C           1         DO   MAX       LAST    20          Do
+     C           W,LAST    IFEQ ' '                           ! If
+     C                     SUB  1         LAST                ! !
+     C                     LEAVE                              ! !
+     C                     ENDIF                              ! Endif
+     C                     ENDDO                              Enddo
+     C*
+     C*
+     C*          Start Search From Row-1
+     C                     Z-ADD1         STR     20
+     C           STR       DOUGEMAX                         Do
+     C           *IN25     OREQ '0'                         !
+     C           W,I       LOKUPR01,STR                  25 !
+     C           *IN25     IFEQ *ON                         ! If
+     C                     Z-ADD1         ROW     20        ! !
+     C                     Z-ADDSTR       COL     20        ! !
+     C                     EXSR $SRCH                       ! !
+     C           FOUND     IFEQ 'Y'                         ! ! If
+     C                     GOTO $ENDSC                      ! ! !
+     C                     ENDIF                            ! ! Endif
+     C                     ADD  1         STR               ! !
+     C                     ENDIF                            ! Endif
+     C                     ENDDO                            Enddo
+     C*
+     C*          Start Search From Row-2
+     C                     Z-ADD1         STR     20
+     C           STR       DOUGEMAX                         Do
+     C           *IN25     OREQ '0'                         !
+     C           W,I       LOKUPR02,STR                  25 !
+     C           *IN25     IFEQ *ON                         ! If
+     C                     Z-ADD2         ROW     20        ! !
+     C                     Z-ADDSTR       COL     20        ! !
+     C                     EXSR $SRCH                       ! !
+     C           FOUND     IFEQ 'Y'                         ! ! If
+     C                     GOTO $ENDSC                      ! ! !
+     C                     ENDIF                            ! ! Endif
+     C                     ADD  1         STR               ! !
+     C                     ENDIF                            ! Endif
+     C                     ENDDO                            Enddo
+     C*
+     C*          Start Search From Row-3
+     C                     Z-ADD1         STR     20
+     C           STR       DOUGEMAX                         Do
+     C           *IN25     OREQ '0'                         !
+     C           W,I       LOKUPR03,STR                  25 !
+     C           *IN25     IFEQ *ON                         ! If
+     C                     Z-ADD3         ROW     20        ! !
+     C                     Z-ADDSTR       COL     20        ! !
+     C                     EXSR $SRCH                       ! !
+     C           FOUND     IFEQ 'Y'                         ! ! If
+     C                     GOTO $ENDSC                      ! ! !
+     C                     ENDIF                            ! ! Endif
+     C                     ADD  1         STR               ! !
+     C                     ENDIF                            ! Endif
+     C                     ENDDO                            Enddo
+     C*
+     C*          Start Search From Row-4
+     C                     Z-ADD1         STR     20
+     C           STR       DOUGEMAX                         Do
+     C           *IN25     OREQ '0'                         !
+     C           W,I       LOKUPR04,STR                  25 !
+     C           *IN25     IFEQ *ON                         ! If
+     C                     Z-ADD4         ROW     20        ! !
+     C                     Z-ADDSTR       COL     20        ! !
+     C                     EXSR $SRCH                       ! !
+     C           FOUND     IFEQ 'Y'                         ! ! If
+     C                     GOTO $ENDSC                      ! ! !
+     C                     ENDIF                            ! ! Endif
+     C                     ADD  1         STR               ! !
+     C                     ENDIF                            ! Endif
+     C                     ENDDO                            Enddo
+     C*
+     C*          Start Search From Row-5
+     C                     Z-ADD1         STR     20
+     C           STR       DOUGEMAX                         Do
+     C           *IN25     OREQ '0'                         !
+     C           W,I       LOKUPR05,STR                  25 !
+     C           *IN25     IFEQ *ON                         ! If
+     C                     Z-ADD5         ROW     20        ! !
+     C                     Z-ADDSTR       COL     20        ! !
+     C                     EXSR $SRCH                       ! !
+     C           FOUND     IFEQ 'Y'                         ! ! If
+     C                     GOTO $ENDSC                      ! ! !
+     C                     ENDIF                            ! ! Endif
+     C                     ADD  1         STR               ! !
+     C                     ENDIF                            ! Endif
+     C                     ENDDO                            Enddo
+     C*
+     C*          Start Search From Row-6
+     C                     Z-ADD1         STR     20
+     C           STR       DOUGEMAX                         Do
+     C           *IN25     OREQ '0'                         !
+     C           W,I       LOKUPR06,STR                  25 !
+     C           *IN25     IFEQ *ON                         ! If
+     C                     Z-ADD6         ROW     20        ! !
+     C                     Z-ADDSTR       COL     20        ! !
+     C                     EXSR $SRCH                       ! !
+     C           FOUND     IFEQ 'Y'                         ! ! If
+     C                     GOTO $ENDSC                      ! ! !
+     C                     ENDIF                            ! ! Endif
+     C                     ADD  1         STR               ! !
+     C                     ENDIF                            ! Endif
+     C                     ENDDO                            Enddo
+     C*
+     C*          Start Search From Row-7
+     C                     Z-ADD1         STR     20
+     C           STR       DOUGEMAX                         Do
+     C           *IN25     OREQ '0'                         !
+     C           W,I       LOKUPR07,STR                  25 !
+     C           *IN25     IFEQ *ON                         ! If
+     C                     Z-ADD7         ROW     20        ! !
+     C                     Z-ADDSTR       COL     20        ! !
+     C                     EXSR $SRCH                       ! !
+     C           FOUND     IFEQ 'Y'                         ! ! If
+     C                     GOTO $ENDSC                      ! ! !
+     C                     ENDIF                            ! ! Endif
+     C                     ADD  1         STR               ! !
+     C                     ENDIF                            ! Endif
+     C                     ENDDO                            Enddo
+     C*
+     C*          Start Search From Row-8
+     C                     Z-ADD1         STR     20
+     C           STR       DOUGEMAX                         Do
+     C           *IN25     OREQ '0'                         !
+     C           W,I       LOKUPR08,STR                  25 !
+     C           *IN25     IFEQ *ON                         ! If
+     C                     Z-ADD8         ROW     20        ! !
+     C                     Z-ADDSTR       COL     20        ! !
+     C                     EXSR $SRCH                       ! !
+     C           FOUND     IFEQ 'Y'                         ! ! If
+     C                     GOTO $ENDSC                      ! ! !
+     C                     ENDIF                            ! ! Endif
+     C                     ADD  1         STR               ! !
+     C                     ENDIF                            ! Endif
+     C                     ENDDO                            Enddo
+     C*
+     C*          Start Search From Row-9
+     C                     Z-ADD1         STR     20
+     C           STR       DOUGEMAX                         Do
+     C           *IN25     OREQ '0'                         !
+     C           W,I       LOKUPR09,STR                  25 !
+     C           *IN25     IFEQ *ON                         ! If
+     C                     Z-ADD9         ROW     20        ! !
+     C                     Z-ADDSTR       COL     20        ! !
+     C                     EXSR $SRCH                       ! !
+     C           FOUND     IFEQ 'Y'                         ! ! If
+     C                     GOTO $ENDSC                      ! ! !
+     C                     ENDIF                            ! ! Endif
+     C                     ADD  1         STR               ! !
+     C                     ENDIF                            ! Endif
+     C                     ENDDO                            Enddo
+     C*
+     C*          Start Search From Row-10
+     C                     Z-ADD1         STR     20
+     C           STR       DOUGEMAX                         Do
+     C           *IN25     OREQ '0'                         !
+     C           W,I       LOKUPR10,STR                  25 !
+     C           *IN25     IFEQ *ON                         ! If
+     C                     Z-ADD10        ROW     20        ! !
+     C                     Z-ADDSTR       COL     20        ! !
+     C                     EXSR $SRCH                       ! !
+     C           FOUND     IFEQ 'Y'                         ! ! If
+     C                     GOTO $ENDSC                      ! ! !
+     C                     ENDIF                            ! ! Endif
+     C                     ADD  1         STR               ! !
+     C                     ENDIF                            ! Endif
+     C                     ENDDO                            Enddo
+     C*
+     C*          Start Search From Row-11
+     C                     Z-ADD1         STR     20
+     C           STR       DOUGEMAX                         Do
+     C           *IN25     OREQ '0'                         !
+     C           W,I       LOKUPR11,STR                  25 !
+     C           *IN25     IFEQ *ON                         ! If
+     C                     Z-ADD11        ROW     20        ! !
+     C                     Z-ADDSTR       COL     20        ! !
+     C                     EXSR $SRCH                       ! !
+     C           FOUND     IFEQ 'Y'                         ! ! If
+     C                     GOTO $ENDSC                      ! ! !
+     C                     ENDIF                            ! ! Endif
+     C                     ADD  1         STR               ! !
+     C                     ENDIF                            ! Endif
+     C                     ENDDO                            Enddo
+     C*
+     C*
+     C           $ENDSC    ENDSR
+     C*
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  $SRCH
+     C* Description     :  To Perform Word Search
+     C*****************************************************************
+     C*
+     C           $SRCH     BEGSR
+     C*
+     C                     MOVE 'N'       MATCH   1
+     C*
+     C*          Initialise Start Row & Columns Search Pointers
+     C                     Z-ADDROW       R       20
+     C                     Z-ADDCOL       C       20
+     C*
+     C*          Current Alphabet Pointer Of The Search Word
+     C                     Z-ADDI         N       20
+     C*
+     C*
+     C*          ---------------------------------------
+     C*          Try The Next Alphabet In "Row", "Col-1"
+     C*          ---------------------------------------
+     C                     Z-ADDROW       R       20
+     C                     Z-ADDCOL       C       20
+     C                     Z-ADDI         N       20
+     C                     Z-ADD1         X       20
+     C                     MOVEA*BLANKS   PATH
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C           C         DOWGTMIN
+     C                     SUB  1         C       20
+     C                     ADD  1         N       20
+     C           W,N       IFEQ ' '
+     C                     SUB  1         N
+     C                     LEAVE
+     C                     ENDIF
+     C                     EXSR $TRY
+     C           MATCH     IFEQ 'N'
+     C                     LEAVE
+     C                     ENDIF
+     C*
+     C                     ADD  1         X
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C*
+     C                     ENDDO
+     C*
+     C*
+     C           MATCH     IFEQ 'Y'
+     C           N         IFNE LAST
+     C                     MOVE 'N'       MATCH
+     C                     ELSE
+     C                     GOTO NOMORE
+     C                     ENDIF
+     C                     ENDIF
+     C*
+     C*
+     C*
+     C*          ---------------------------------------
+     C*          Try The Next Alphabet In "Row", "Col+1"
+     C*          ---------------------------------------
+     C                     Z-ADDROW       R       20
+     C                     Z-ADDCOL       C       20
+     C                     Z-ADDI         N       20
+     C                     Z-ADD1         X       20
+     C                     MOVEA*BLANKS   PATH
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C           C         DOWLTMAX
+     C                     ADD  1         C       20
+     C                     ADD  1         N       20
+     C           W,N       IFEQ ' '
+     C                     SUB  1         N
+     C                     LEAVE
+     C                     ENDIF
+     C                     EXSR $TRY
+     C           MATCH     IFEQ 'N'
+     C                     LEAVE
+     C                     ENDIF
+     C*
+     C                     ADD  1         X
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C*
+     C                     ENDDO
+     C*
+     C           MATCH     IFEQ 'Y'
+     C           N         IFNE LAST
+     C                     MOVE 'N'       MATCH
+     C                     ELSE
+     C                     GOTO NOMORE
+     C                     ENDIF
+     C                     ENDIF
+     C*
+     C*
+     C*
+     C*          -----------------------------------------
+     C*          Try The Next Alphabet In "Row-1", "Col-1"
+     C*          -----------------------------------------
+     C                     Z-ADDROW       R       20
+     C                     Z-ADDCOL       C       20
+     C                     Z-ADDI         N       20
+     C                     Z-ADD1         X       20
+     C                     MOVEA*BLANKS   PATH
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C           R         DOWGTMIN
+     C           C         ANDGTMIN
+     C                     SUB  1         R       20
+     C                     SUB  1         C       20
+     C                     ADD  1         N       20
+     C           W,N       IFEQ ' '
+     C                     SUB  1         N
+     C                     LEAVE
+     C                     ENDIF
+     C                     EXSR $TRY
+     C           MATCH     IFEQ 'N'
+     C                     LEAVE
+     C                     ENDIF
+     C*
+     C                     ADD  1         X
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C*
+     C                     ENDDO
+     C*
+     C           MATCH     IFEQ 'Y'
+     C           N         IFNE LAST
+     C                     MOVE 'N'       MATCH
+     C                     ELSE
+     C                     GOTO NOMORE
+     C                     ENDIF
+     C                     ENDIF
+     C*
+     C*
+     C*
+     C*          ---------------------------------------
+     C*          Try The Next Alphabet In "Row-1", "Col"
+     C*          ---------------------------------------
+     C                     Z-ADDROW       R       20
+     C                     Z-ADDCOL       C       20
+     C                     Z-ADDI         N       20
+     C                     Z-ADD1         X       20
+     C                     MOVEA*BLANKS   PATH
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C           R         DOWGTMIN
+     C                     SUB  1         R       20
+     C                     ADD  1         N       20
+     C           W,N       IFEQ ' '
+     C                     SUB  1         N
+     C                     LEAVE
+     C                     ENDIF
+     C                     EXSR $TRY
+     C           MATCH     IFEQ 'N'
+     C                     LEAVE
+     C                     ENDIF
+     C*
+     C                     ADD  1         X
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C*
+     C                     ENDDO
+     C*
+     C           MATCH     IFEQ 'Y'
+     C           N         IFNE LAST
+     C                     MOVE 'N'       MATCH
+     C                     ELSE
+     C                     GOTO NOMORE
+     C                     ENDIF
+     C                     ENDIF
+     C*
+     C*
+     C*
+     C*          -----------------------------------------
+     C*          Try The Next Alphabet In "Row-1", "Col+1"
+     C*          -----------------------------------------
+     C                     Z-ADDROW       R       20
+     C                     Z-ADDCOL       C       20
+     C                     Z-ADDI         N       20
+     C                     Z-ADD1         X       20
+     C                     MOVEA*BLANKS   PATH
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C           R         DOWGTMIN
+     C           C         ANDLTMAX
+     C                     SUB  1         R       20
+     C                     ADD  1         C       20
+     C                     ADD  1         N       20
+     C           W,N       IFEQ ' '
+     C                     SUB  1         N
+     C                     LEAVE
+     C                     ENDIF
+     C                     EXSR $TRY
+     C           MATCH     IFEQ 'N'
+     C                     LEAVE
+     C                     ENDIF
+     C*
+     C                     ADD  1         X
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C*
+     C                     ENDDO
+     C*
+     C           MATCH     IFEQ 'Y'
+     C           N         IFNE LAST
+     C                     MOVE 'N'       MATCH
+     C                     ELSE
+     C                     GOTO NOMORE
+     C                     ENDIF
+     C                     ENDIF
+     C*
+     C*
+     C*
+     C*          -----------------------------------------
+     C*          Try The Next Alphabet In "Row+1", "Col-1"
+     C*          -----------------------------------------
+     C                     Z-ADDROW       R       20
+     C                     Z-ADDCOL       C       20
+     C                     Z-ADDI         N       20
+     C                     Z-ADD1         X       20
+     C                     MOVEA*BLANKS   PATH
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C           R         DOWLTMAX
+     C           C         ANDGTMIN
+     C                     ADD  1         R       20
+     C                     SUB  1         C       20
+     C                     ADD  1         N       20
+     C           W,N       IFEQ ' '
+     C                     SUB  1         N
+     C                     LEAVE
+     C                     ENDIF
+     C                     EXSR $TRY
+     C           MATCH     IFEQ 'N'
+     C                     LEAVE
+     C                     ENDIF
+     C*
+     C                     ADD  1         X
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C*
+     C                     ENDDO
+     C*
+     C           MATCH     IFEQ 'Y'
+     C           N         IFNE LAST
+     C                     MOVE 'N'       MATCH
+     C                     ELSE
+     C                     GOTO NOMORE
+     C                     ENDIF
+     C                     ENDIF
+     C*
+     C*
+     C*
+     C*          ---------------------------------------
+     C*          Try The Next Alphabet In "Row+1", "Col"
+     C*          ---------------------------------------
+     C                     Z-ADDROW       R       20
+     C                     Z-ADDCOL       C       20
+     C                     Z-ADDI         N       20
+     C                     Z-ADD1         X       20
+     C                     MOVEA*BLANKS   PATH
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C           R         DOWLTMAX
+     C                     ADD  1         R       20
+     C                     ADD  1         N       20
+     C           W,N       IFEQ ' '
+     C                     SUB  1         N
+     C                     LEAVE
+     C                     ENDIF
+     C                     EXSR $TRY
+     C           MATCH     IFEQ 'N'
+     C                     LEAVE
+     C                     ENDIF
+     C*
+     C                     ADD  1         X
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C*
+     C                     ENDDO
+     C*
+     C           MATCH     IFEQ 'Y'
+     C           N         IFNE LAST
+     C                     MOVE 'N'       MATCH
+     C                     ELSE
+     C                     GOTO NOMORE
+     C                     ENDIF
+     C                     ENDIF
+     C*
+     C*
+     C*
+     C*          -----------------------------------------
+     C*          Try The Next Alphabet In "Row+1", "Col+1"
+     C*          -----------------------------------------
+     C                     Z-ADDROW       R       20
+     C                     Z-ADDCOL       C       20
+     C                     Z-ADDI         N       20
+     C                     Z-ADD1         X       20
+     C                     MOVEA*BLANKS   PATH
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C           R         DOWLTMAX
+     C           C         ANDLTMAX
+     C                     ADD  1         R       20
+     C                     ADD  1         C       20
+     C                     ADD  1         N       20
+     C           W,N       IFEQ ' '
+     C                     SUB  1         N
+     C                     LEAVE
+     C                     ENDIF
+     C                     EXSR $TRY
+     C           MATCH     IFEQ 'N'
+     C                     LEAVE
+     C                     ENDIF
+     C*
+     C                     ADD  1         X
+     C                     MOVE R         POS12
+     C                     MOVE C         POS34
+     C                     MOVE POS14     PATH,X
+     C*
+     C                     ENDDO
+     C*
+     C           MATCH     IFEQ 'Y'
+     C           N         IFNE LAST
+     C                     MOVE 'N'       MATCH
+     C                     ELSE
+     C                     GOTO NOMORE
+     C                     ENDIF
+     C                     ENDIF
+     C*
+     C*          Clear The Path & Indicators, Since No Match Found
+     C                     MOVEA*BLANKS   PATH
+     C                     MOVEA*ALL'0'   *IN,61
+     C*
+     C           NOMORE    TAG
+     C*
+     C                     MOVE MATCH     FOUND   1
+     C           MATCH     IFEQ 'Y'
+     C                     EXSR $SETIN
+     C                     ENDIF
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  $TRY
+     C* Description     :  To Try To Match The Search Word
+     C*****************************************************************
+     C*
+     C           $TRY      BEGSR
+     C*
+     C*
+     C                     SELEC                            Selec
+     C*                                                     !
+     C           R         WHEQ 1                           ! Row-1
+     C           R01,C     ANDEQW,N                         !
+     C                     MOVE 'Y'       MATCH             !
+     C*                                                     !
+     C           R         WHEQ 2                           ! Row-2
+     C           R02,C     ANDEQW,N                         !
+     C                     MOVE 'Y'       MATCH             !
+     C*                                                     !
+     C           R         WHEQ 3                           ! Row-3
+     C           R03,C     ANDEQW,N                         !
+     C                     MOVE 'Y'       MATCH             !
+     C*                                                     !
+     C           R         WHEQ 4                           ! Row-4
+     C           R04,C     ANDEQW,N                         !
+     C                     MOVE 'Y'       MATCH             !
+     C*                                                     !
+     C           R         WHEQ 5                           ! Row-5
+     C           R05,C     ANDEQW,N                         !
+     C                     MOVE 'Y'       MATCH             !
+     C*                                                     !
+     C           R         WHEQ 6                           ! Row-6
+     C           R06,C     ANDEQW,N                         !
+     C                     MOVE 'Y'       MATCH             !
+     C*                                                     !
+     C           R         WHEQ 7                           ! Row-7
+     C           R07,C     ANDEQW,N                         !
+     C                     MOVE 'Y'       MATCH             !
+     C*                                                     !
+     C           R         WHEQ 8                           ! Row-8
+     C           R08,C     ANDEQW,N                         !
+     C                     MOVE 'Y'       MATCH             !
+     C*                                                     !
+     C           R         WHEQ 9                           ! Row-9
+     C           R09,C     ANDEQW,N                         !
+     C                     MOVE 'Y'       MATCH             !
+     C*                                                     !
+     C           R         WHEQ 10                          ! Row-10
+     C           R10,C     ANDEQW,N                         !
+     C                     MOVE 'Y'       MATCH             !
+     C*                                                     !
+     C           R         WHEQ 11                          ! Row-11
+     C           R11,C     ANDEQW,N                         !
+     C                     MOVE 'Y'       MATCH             !
+     C*                                                     !
+     C                     OTHER                            ! Else
+     C                     MOVE 'N'       MATCH             !
+     C*                                                     !
+     C                     ENDSL                            Endsl
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  $SETIN
+     C* Description     :  To Turn On The Appropriate Indicators,
+     C*                    In Case Of A Perfect Word Match
+     C*****************************************************************
+     C*
+     C           $SETIN    BEGSR
+     C*
+     C           1         DO   MAX       X                 Do
+     C*                                                     !
+     C           PATH,X    IFEQ *BLANKS                     ! If
+     C                     LEAVE                            ! !
+     C                     ENDIF                            ! Endif
+     C*                                                     !
+     C                     MOVE PATH,X    POS14             !
+     C                     MOVE POS12     R                 !
+     C                     MOVE POS34     C                 !
+     C*                                                     !
+     C           R         CHAINSUBFL                99     !
+     C           *IN99     IFEQ '0'                         ! If
+     C                     ADD  60        C                 ! !
+     C                     MOVEAHIND      *IN,61            ! !
+     C                     MOVE '1'       *IN,C             ! !
+     C                     MOVEA*IN,61    HIND              ! !
+     C                     UPDATSUBFL                       ! !
+     C                     ENDIF                            ! Endif
+     C*                                                     !
+     C                     MOVEA*ALL'0'   *IN,61            !
+     C*                                                     !
+     C                     ENDDO                            Enddo
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  $RSTIN
+     C* Description     :  To Reset The Appropriate Indicators
+     C*****************************************************************
+     C*
+     C           $RSTIN    BEGSR
+     C*
+     C           1         DO   MAX       X                 Do
+     C*                                                     !
+     C           PATH,X    IFEQ *BLANKS                     ! If
+     C                     LEAVE                            ! !
+     C                     ENDIF                            ! Endif
+     C*                                                     !
+     C                     MOVE PATH,X    POS14             !
+     C                     MOVE POS12     R                 !
+     C                     MOVE POS34     C                 !
+     C*                                                     !
+     C           R         CHAINSUBFL                99     !
+     C           *IN99     IFEQ '0'                         ! If
+     C                     ADD  60        C                 ! !
+     C                     MOVEAHIND      *IN,61            ! !
+     C                     MOVE '0'       *IN,C             ! !
+     C                     MOVEA*IN,61    HIND              ! !
+     C                     UPDATSUBFL                       ! !
+     C                     ENDIF                            ! Endif
+     C*                                                     !
+     C                     ENDDO                            Enddo
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  *INZSR
+     C* Description     :  To Perform First Time Initialization
+     C*****************************************************************
+     C*
+     C           *INZSR    BEGSR
+     C*
+     C*          Initialise The Program Variables
+     C                     Z-ADD1         MIN     20
+     C                     Z-ADD11        MAX     20
+     C*
+     C*          Retrieve The Current System time & Date
+     C                     TIME           TIMDAT
+     C*
+     C*          Initialize The Subfile For Use
+     C                     MOVE '1'       *IN40
+     C                     WRITESUBCTL
+     C                     MOVE '0'       *IN40
+     C                     Z-ADD1         RECNO
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************

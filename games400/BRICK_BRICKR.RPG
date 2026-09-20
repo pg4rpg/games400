@@ -1,0 +1,369 @@
+     H            Y-
+     F*--------------------------------------------------------------*
+     F* Program : BRICKR                                             *
+     F*                                                              *
+     F*--------------------------------------------------------------*
+     F* Date    : 941024                                             *
+     F* Author  : Bengt Persson                                      *
+     F* Modif.  :                                                    *
+     F*--------------------------------------------------------------*
+     FBRICKD  CF  E                    WORKSTN
+     E                    A1         16  3
+     E                    AT1        16  1
+     E* Compile-time Arrays:
+     E                    ERR     1   2 70
+     E                    FXX     1  16  3
+     E                    VAL     1  16 12
+     I* Constants:
+     I              ' A  L  J  O -        C         KON1
+     I              ' E  D  I  H -
+     I              ' F  M  C  N -
+     I              ' K  B     G '
+     I*
+     I              ' O  K  I  N -        C         KON2
+     I              ' D     H  G -
+     I              ' E  L  B  M -
+     I              ' J  A  C  F '
+     I*
+     I              ' A  B  C  D -        C         KOR1
+     I              ' E  F  G  H -
+     I              ' I  J  K  L -
+     I              ' M  N  O    '
+     I              X'20'                 C         HEX20
+     I              X'23'                 C         HEX23
+     IWSYS       SDS
+     I                                      254 263 USER
+     IWVAL        DS
+     I                                        1  120WALLT
+     I                                        1   20WA1
+     I                                        3   40WA2
+     I                                        5   60WA3
+     I                                        7   80WA4
+     I                                        9  100WA5
+     I                                       11  120WA6
+     IWREC        DS
+     I                                        1   3 F01
+     I                                        4   6 F02
+     I                                        7   9 F03
+     I                                       10  12 F04
+     I                                       13  15 F05
+     I                                       16  18 F06
+     I                                       19  21 F07
+     I                                       22  24 F08
+     I                                       25  27 F09
+     I                                       28  30 F10
+     I                                       31  33 F11
+     I                                       34  36 F12
+     I                                       37  39 F13
+     I                                       40  42 F14
+     I                                       43  45 F15
+     I                                       46  48 F16
+     IWATR        DS
+     I                                        1   1 A01
+     I                                        2   2 A02
+     I                                        3   3 A03
+     I                                        4   4 A04
+     I                                        5   5 A05
+     I                                        6   6 A06
+     I                                        7   7 A07
+     I                                        8   8 A08
+     I                                        9   9 A09
+     I                                       10  10 A10
+     I                                       11  11 A11
+     I                                       12  12 A12
+     I                                       13  13 A13
+     I                                       14  14 A14
+     I                                       15  15 A15
+     I                                       16  16 A16
+     IWTIME       DS
+     I                                        1   60WTI
+     I                                        1   20HOU
+     I                                        3   40MIN
+     I                                        5   60SEC
+     I                                        6   60SEC2
+     C*
+     C                     EXSR INIT
+     C                     EXSR HEAD
+     C                     EXSR ENDIT
+     C*---------------------------------------------------------------
+     C           HEAD      BEGSR
+     C*---------------------------------------------------------------
+     C           H100      TAG
+     C                     EXFMTREC1
+     C           *IN33     IFEQ *ON
+     C           *IN32     OREQ *ON
+     C                     GOTO H999
+     C                     ENDIF
+     C                     MOVE *ALL' '   MESS
+     C                     MOVEAA1        WREC
+     C                     EXSR GETNR
+     C                     EXSR MOVEM
+     C                     GOTO H100
+     C           H999      TAG
+     C                     ENDSR
+     C*---------------------------------------------------------------
+     C           INIT      BEGSR
+     C*---------------------------------------------------------------
+     C* Here we start.
+     C                     CLEARA1
+     C                     CLEARWREC
+     C                     MOVE *BLANK    WCF     3
+     C                     MOVE *BLANK    STAT    1
+     C                     MOVE *BLANK    SAV     3
+     C                     Z-ADD0         DIF     20
+     C                     Z-ADD0         W1      20
+     C                     Z-ADD0         W2      20
+     C                     Z-ADD0         W3      20
+     C                     Z-ADD0         W4      20
+     C                     Z-ADD0         T1      20
+     C                     Z-ADD0         WC1     20
+     C                     Z-ADD0         WX      20
+     C                     Z-ADD0         WXX     20
+     C                     Z-ADD0         WY      20
+     C                     Z-ADD0         WZ      20
+     C                     Z-ADD0         FR      20
+     C                     Z-ADD0         TO      20
+     C                     Z-ADD0         TAL1    10
+     C                     Z-ADD0         TAL2    10
+     C                     TIME           WTI
+     C           SEC2      IFLE 4
+     C                     MOVELKON1      WREC
+     C                     ELSE
+     C                     MOVELKON2      WREC
+     C                     ENDIF
+     C                     MOVEAWREC      A1
+     C                     CLEARAT1
+     C                     EXSR SETATR
+     C                     MOVEAAT1       WATR
+     C                     ENDSR
+     C*---------------------------------------------------------------
+     C           SETATR    BEGSR
+     C*---------------------------------------------------------------
+     C                     Z-ADD0         W1
+     C                     DO   16        W1
+     C           A1,W1     IFEQ '   '
+     C                     MOVE *ON       *IN,W1
+     C                     MOVE HEX20     AT1,W1
+     C                     ELSE
+     C                     MOVE *OFF      *IN,W1
+     C                     MOVE HEX23     AT1,W1
+     C                     ENDIF
+     C                     ENDDO
+     C                     ENDSR
+     C*---------------------------------------------------------------
+     C           GETNR     BEGSR
+     C*---------------------------------------------------------------
+     C                     MOVELCF        WCF
+     C                     Z-ADD1         WX
+     C           WCF       LOKUPFXX,WX                   80
+     C                     MOVELA1,WX     SAV
+     C                     ENDSR
+     C*---------------------------------------------------------------
+     C           MOVEM     BEGSR
+     C*---------------------------------------------------------------
+     C                     MOVE ' '       STAT
+     C* Contains the (field)number (1-16) that Enter was pressed on.
+     C* In T1, we store the number of the "empty slot".
+     C                     Z-ADDWX        WZ
+     C                     Z-ADD0         W2
+     C                     DO   16        W2
+     C           A1,W2     IFEQ '   '
+     C                     Z-ADDW2        T1
+     C                     ENDIF
+     C                     ENDDO
+     C* Set off all Position Cursor.
+     C                     EXSR SEOF
+     C* Is it a valid letter? Is it possible to move at all?
+     C                     MOVE VAL,WX    WVAL
+     C           A1,WA1    IFEQ '   '
+     C           A1,WA2    OREQ '   '
+     C           A1,WA3    OREQ '   '
+     C           A1,WA4    OREQ '   '
+     C           A1,WA5    OREQ '   '
+     C           A1,WA6    OREQ '   '
+     C                     MOVE 'Y'       STAT
+     C                     ELSE
+     C                     MOVE ERR,1     MESS
+     C                     GOTO F999
+     C                     ENDIF
+     C* STAT = 'Y', then we move on and move the letter(s).
+     C           T1        IFLT WX
+     C           WX        SUB  T1        DIF
+     C                     MOVE '<'       STAT
+     C                     ELSE
+     C           T1        SUB  WX        DIF
+     C                     MOVE '>'       STAT
+     C                     ENDIF
+     C                     SELEC
+     C           STAT      WHEQ '<'
+     C           DIF       ANDLE3
+     C                     MOVE 'L'       STAT
+     C           STAT      WHEQ '<'
+     C           DIF       ANDGE4
+     C                     MOVE 'U'       STAT
+     C           STAT      WHEQ '>'
+     C           DIF       ANDLE3
+     C                     MOVE 'R'       STAT
+     C           STAT      WHEQ '>'
+     C           DIF       ANDGE4
+     C                     MOVE 'D'       STAT
+     C                     ENDSL
+     C* DIF now contains the number of letters to be moved.
+     C* STAT contains in wich direction (L R U D).
+     C* Possible values of DIF = 1, 2, 3, 4, 8, 12.
+     C* Most simple if DIF = 1, so we start with that!
+     C           DIF       IFEQ 1
+     C           DIF       OREQ 4
+     C                     MOVE A1,WX     A1,T1
+     C                     MOVE '   '     A1,WX
+     C                     ELSE
+     C                     EXSR MOVIT
+     C                     ENDIF
+     C*
+     C                     CLEARAT1
+     C                     EXSR SETATR
+     C                     MOVEAAT1       WATR
+     C                     MOVEAA1        WREC
+     C*
+     C                     Z-ADD1         W3
+     C           SAV       LOKUPA1,W3                    80
+     C                     ADD  16        W3
+     C                     MOVE *ON       *IN,W3
+     C* Is it finished?
+     C           WREC      IFEQ KOR1
+     C                     MOVE ERR,2     MESS
+     C                     ENDIF
+     C           F999      TAG
+     C                     ENDSR
+     C*---------------------------------------------------------------
+     C           MOVIT     BEGSR
+     C*---------------------------------------------------------------
+     C                     Z-ADDWX        WXX
+     C                     Z-ADDT1        TO
+     C                     SELEC
+     C           DIF       WHEQ 2
+     C           STAT      ANDEQ'L'
+     C                     Z-ADD-1        FR
+     C                     Z-ADD1         TAL1
+     C                     Z-ADD1         TAL2
+     C           DIF       WHEQ 3
+     C           STAT      ANDEQ'L'
+     C                     Z-ADD-2        FR
+     C                     Z-ADD1         TAL1
+     C                     Z-ADD1         TAL2
+     C           DIF       WHEQ 2
+     C           STAT      ANDEQ'R'
+     C                     Z-ADD1         FR
+     C                     Z-ADD-1        TAL1
+     C                     Z-ADD-1        TAL2
+     C           DIF       WHEQ 3
+     C           STAT      ANDEQ'R'
+     C                     Z-ADD2         FR
+     C                     Z-ADD-1        TAL1
+     C                     Z-ADD-1        TAL2
+     C           DIF       WHEQ 8
+     C           STAT      ANDEQ'U'
+     C                     Z-ADD-4        FR
+     C                     Z-ADD4         TAL1
+     C                     Z-ADD4         TAL2
+     C           DIF       WHEQ 12
+     C           STAT      ANDEQ'U'
+     C                     Z-ADD-8        FR
+     C                     Z-ADD4         TAL1
+     C                     Z-ADD4         TAL2
+     C           DIF       WHEQ 8
+     C           STAT      ANDEQ'D'
+     C                     Z-ADD4         FR
+     C                     Z-ADD-4        TAL1
+     C                     Z-ADD-4        TAL2
+     C           DIF       WHEQ 12
+     C           STAT      ANDEQ'D'
+     C                     Z-ADD8         FR
+     C                     Z-ADD-4        TAL1
+     C                     Z-ADD-4        TAL2
+     C                     ENDSL
+     C*
+     C                     SELEC
+     C           DIF       WHEQ 2
+     C           DIF       OREQ 8
+     C                     ADD  FR        WXX
+     C                     MOVE A1,WXX    A1,TO
+     C                     ADD  TAL1      WXX
+     C                     ADD  TAL1      TO
+     C                     MOVE A1,WXX    A1,TO
+     C                     MOVE '   '     A1,WXX
+     C           DIF       WHEQ 3
+     C           DIF       OREQ 12
+     C                     ADD  FR        WXX
+     C                     MOVE A1,WXX    A1,TO
+     C                     ADD  TAL1      WXX
+     C                     ADD  TAL1      TO
+     C                     MOVE A1,WXX    A1,TO
+     C                     ADD  TAL1      WXX
+     C                     ADD  TAL1      TO
+     C                     MOVE A1,WXX    A1,TO
+     C                     MOVE '   '     A1,WXX
+     C                     ENDSL
+     C                     ENDSR
+     C*---------------------------------------------------------------
+     C           SEOF      BEGSR
+     C*---------------------------------------------------------------
+     C                     MOVE *OFF      *IN17
+     C                     MOVE *OFF      *IN18
+     C                     MOVE *OFF      *IN19
+     C                     MOVE *OFF      *IN20
+     C                     MOVE *OFF      *IN21
+     C                     MOVE *OFF      *IN22
+     C                     MOVE *OFF      *IN23
+     C                     MOVE *OFF      *IN24
+     C                     MOVE *OFF      *IN25
+     C                     MOVE *OFF      *IN26
+     C                     MOVE *OFF      *IN27
+     C                     MOVE *OFF      *IN28
+     C                     MOVE *OFF      *IN29
+     C                     MOVE *OFF      *IN30
+     C                     MOVE *OFF      *IN31
+     C                     MOVE *OFF      *IN32
+     C                     ENDSR
+     C*---------------------------------------------------------------
+     C           ENDIT     BEGSR
+     C*---------------------------------------------------------------
+     C                     MOVE '1'       *INLR
+     C                     ENDSR
+** Array ERR
+                  You can not move any letter there...
+                     Congratulations! You did it!
+** Array FXX
+F01
+F02
+F03
+F04
+F05
+F06
+F07
+F08
+F09
+F10
+F11
+F12
+F13
+F14
+F15
+F16
+** Array VAL
+020304050913
+010304061014
+010204071115
+010203081216
+010607080913
+020507081014
+030506081115
+040506071216
+010510111213
+020609111214
+030709101215
+040809101116
+010509141516
+020610131516
+030711131416
+040812131415

@@ -1,0 +1,83 @@
+     A**************************************************************
+     A*  MINESW  -  SCREEN DDS FOR PROGRAM MINES                   *
+     A*                                                            *
+     A**************************************************************
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      CF03(03 'CMD3')
+     A                                      CF05(05 'CMD5')
+     A                                      CF10(10 'CMD10')
+     A                                      CF11(11 'CMD11')
+     A                                      CF12(12 'CMD12')
+     A                                      HELP
+     A**************************************************************
+     A          R MINESW01
+     A            VOLBA          1A  B  1  3CHGINPDFT
+     A                                      CHECK(ER)
+     A                                      DSPATR(ND)
+     A                                  1 13'MINES FIELD'
+     A                                      DSPATR(HI)
+     A                                  1 54'Mines in neighborhood:'
+     A            FLD023         1S 0O  1 77
+     A            FLD001        79A  O  2  2
+     A            FLD002        79A  O  3  2
+     A            FLD003        79A  O  4  2
+     A            FLD004        79A  O  5  2
+     A            FLD005        79A  O  6  2
+     A            FLD006        79A  O  7  2
+     A            FLD007        79A  O  8  2
+     A            FLD008        79A  O  9  2
+     A            FLD009        79A  O 10  2
+     A            FLD010        79A  O 11  2
+     A            FLD011        79A  O 12  2
+     A            FLD012        79A  O 13  2
+     A            FLD013        79A  O 14  2
+     A            FLD014        79A  O 15  2
+     A            FLD015        79A  O 16  2
+     A            FLD016        79A  O 17  2
+     A            FLD017        79A  O 18  2
+     A            FLD018        79A  O 19  2
+     A            FLD019        79A  O 20  2
+     A            FLD020        79A  O 21  2
+     A            FLD021        79A  O 22  2
+     A                                 23  2'  F3=End     F5=Restart          S-
+     A                                      how mines: F10=Near, F11=All     Sp-
+     A                                      ace=Boss'
+     A            FLD024        75A  O 24  2DSPATR(HI)
+     A                                  1 37'Exit'
+     A**************************************************************
+     A          R MINESW02
+     A                                  1 27'Work with All Spooled Files'
+     A                                      DSPATR(HI)
+     A                                  3  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A            VOLBA          1A  B  9  3CHGINPDFT
+     A                                      CHECK(ER)
+     A                                  4  4'1=Send   2=Change   3=Hold   4=Del-
+     A                                      ete   5=Display   6=Release   7=Mes-
+     A                                      sages'
+     A                                      COLOR(BLU)
+     A                                  5  4'8=Attributes        9=Work with pr-
+     A                                      inting status'
+     A                                      COLOR(BLU)
+     A                                  7 31'Device or                     Tota-
+     A                                      l     Cur'
+     A                                      DSPATR(HI)
+     A                                  8  2'Opt  File        User        Queue-
+     A                                             User Data   Sts   Pages    P-
+     A                                      age  Copy'
+     A                                      DSPATR(HI)
+     A                                  9  7'QPFCPRTO    QUSER       QPRINT    -
+     A                                                    RDY       5          -
+     A                                         1'
+     A                                 20  2'Parameters for options 1, 2, 3 or -
+     A                                      command'
+     A                                 21  2'===>'
+     A                                 21  7'                                  -
+     A                                                                         -
+     A                                          '
+     A                                      DSPATR(UL)
+     A                                 22  2'F3=Exit   F10=View 3   F11=View 2 -
+     A                                        F12=Cancel   F22=Printers   F24=M-
+     A                                      ore keys'
+     A                                      COLOR(BLU)
+     A********** End of source ************************************************

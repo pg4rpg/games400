@@ -1,0 +1,1481 @@
+     H datedit(*ymd-)
+     +*--------------------------------------------------------------*
+     +* Program : OTH400R                                            *
+     +*                                                              *
+     +*           Work-areas :                                       *
+     +*             Tables   :                                       *
+     +*                AA    : Head-table 1 that with WAA makes a    *
+     +*                        "Two dimensional" array. Here we      *
+     +*                        put in the moves.                     *
+     +*                A1    : Headtable 2. All moves are put in     *
+     +*                        here in 1 dimension.                  *
+     +*                A2    : How many alternatives were there for  *
+     +*                        the Computer / class?                 *
+     +*                AT1   : Attribute-table.                      *
+     +*                ERR   : Compile-time array. Messages.         *
+     +*                FXX   : Compile-time array. To translate      *
+     +*                        a fieldname to a number (1-64).       *
+     +*                XY    : Compile-time array. To translate a    *
+     +*                        X-Y index to a number (1-64) or       *
+     +*                        the other way around.                 *
+     +*                                                              *
+     +*             Data area:                                       *
+     +*                FEEDBK: Information Data Structure.           *
+     +*                        To get the Terminal Type.             *
+     +*                WAA   : See above (AA).                       *
+     +*                WDAT  : Here we store the possible moves      *
+     +*                        of the computer. Class, number that   *
+     +*                        can be turned and index (1-64).       *
+     +*                WORK  : General testarea to find out how much *
+     +*                        that can be turned from a given posi- *
+     +*                        tion.                                 *
+     +*                WTEMP : Area to find an index (1-64) with     *
+     +*                        an X and Y value as input (LOKUP).    *
+     +*                WDIR  : Flags for the 8 directions.           *
+     +*                WREC  : Another name for fields F01-F64 in    *
+     +*                        the DSPF.                             *
+     +*                WATR  : Another name for fields A01-A64 in    *
+     +*                        the DSPF.                             *
+     +*                WSYS  : Here we get the Username.             *
+     +*                                                              *
+     +*             Display-                                         *
+     +*             fields   :                                       *
+     +*                CF    : What cursor position is Enter pressed *
+     +*                        on. (RTNCSRLOC).                      *
+     +*                                                              *
+     +*             Variables:                                       *
+     +*                HEXX  : Attribute and color of "X":s.         *
+     +*                HEXO  : Attribute and color of "O":s.         *
+     +*                WANT  : How many could be turned / direction. *
+     +*                WANTD : How many could be turned / direction  *
+     +*                        for the computer.                     *
+     +*                WTOT  : Total number that could be turned.    *
+     +*                WTOT2 : How many of the 64 is taken?          *
+     +*                W1    : Index (1-64).                         *
+     +*                WC1   : Index. Used in "CLEAR" subroutine.    *
+     +*                WTAL1 : Count with in WAA,AA.                 *
+     +*                WTAL2 : --------"------------                 *
+     +*                WCF   : Temporary CF.                         *
+     +*                WX    : Counter 0-99.                         *
+     +*                WY    : Counter 0-99.                         *
+     +*                WZ    : Counter 0-99.                         *
+     +*                X     : Index (1-64).                         *
+     +*                Y     : Index (1-64).                         *
+     +*                                                              *
+     +*            Indicators:                                       *
+     +*                01-64 : Protect (on), nondisp (off).          *
+     +*                99    : Keyb. lock.                           *
+     +*                70    : F3.                                   *
+     +*                71    : F12.                                  *
+     +*                                                              *
+     +*            Subroutine:                                       *
+     +*                AS400 : The Computers move.                   *
+     +*                CHKIT : Checks in all 8 directions if there   *
+     +*                        is anything "to turn".                *
+     +*                CHKUSR: Check if User must "pass".            *
+     +*                CLASS : Classify the computers moves:         *
+     +*                        1 "Dangerous"                         *
+     +*                        5 "Normal"                            *
+     +*                        7 "Good"                              *
+     +*                        9 "Extremely good"                    *
+     +*                CWAA  : Clear   WAA.                          *
+     +*                CWDAT : Clear   WDAT.                         *
+     +*                CWORK : Clear   WORK.                         *
+     +*                DSPATR: Put right color on all positions.     *
+     +*                HEAD  : Here everything happens.              *
+     +*                FNDTRN: Something to turn at all? (WREF).     *
+     +*                FNDBST: Find best X and Y.                    *
+     +*                GETMSG: Get the right "End-Message".          *
+     +*                GETNR : Translate CF to X, Y and W1 (1-64).   *
+     +*                INIT  : Initialize and set start-positions.   *
+     +*                LOD   : Run by SAVLOD.                        *
+     +*                SAVLOD: Save/Load games.                      *
+     +*                SAV   : Run by SAVLOD.                        *
+     +*                STAT  : Who is leading? (Checked in A1).      *
+     +*                TURN  : Turn bricks. (With X and Y as starting*
+     +*                        point everything turnable is turned to*
+     +*                        whats in WREF at the moment.          *
+     +*                TURNIT: Run bu TURN.                          *
+     +*                WAIT1 : Wait 1 second.                        *
+     +*                WAIT5 : Wait 5 seconds.                       *
+     +*--------------------------------------------------------------*
+     +* Date    : 931018                                             *
+     +* Author  : Bengt Persson                                      *
+     +* Modif.  : Many|                                              *
+     +*--------------------------------------------------------------*
+     Foth400pf  uf a e           k disk
+     Foth400d   cf   e             workstn
+     F                                     infds(feedbk)
+     +* Arrays:
+     D a1              s              1    dim(64)
+     D a2              s              2  0 dim(9)
+     D at1             s              1    dim(64)
+     +* Compile-time Arrays:
+     D err             s             70    dim(8) ctdata perrcd(1)
+     D fxx             s              3    dim(64) ctdata perrcd(1)
+     D xy              s              4  0 dim(64) ctdata perrcd(1)
+     +* Constants:
+     D cmd1            c                   const('DLYJOB DLY(1)')
+     D cmd2            c                   const('DLYJOB DLY(5)')
+     D hex00           c                   const(x'00')
+     D hexa2           c                   const(x'A2')
+     D hexa3           c                   const(x'A3')
+     D hexb8           c                   const(x'B8')
+     D hexa8           c                   const(x'A8')
+     +* Work Areas:
+     D cmda            s             15
+     D cmdb            s             15
+     D d1              s              2  0
+     D hexo            s              1
+     D hexx            s              1
+     D lena            s             15  5
+     D want            s              2  0
+     D wantd           s              2  0
+     D wcf             s              3
+     D wc1             s              2  0
+     D wref            s              1
+     D wriktn          s              1
+     D wtal1           s              1  0
+     D wtal2           s              1  0
+     D wtot            s              2  0
+     D wtot2           s              2  0
+     D wtyp            s              1
+     D wx              s              2  0
+     D wy              s              2  0
+     D wz              s              2  0
+     D w1              s              2  0
+     D x               s              2  0
+     D x1              s              2  0
+     D y               s              2  0
+     D y1              s              2  0
+     +* Data Structures:
+     D feedbk          ds
+     D  devd                 272    277
+     D wsys           sds
+     D  jobnam               244    253
+     D  user                 254    263
+     D waa             ds                  occurs(25)
+     D  aa                     1     25    dim(25)
+     D wdat            ds                  occurs(25)
+     D  wd1                    1      1  0
+     D  wd2                    2      3  0
+     D  wd3                    4      6  0
+     D work            ds                  occurs(64)
+     D  ant                    1      2  0
+     D  cls                    3      3  0
+     D  sts                    4      4
+     D  dir                    5     12
+     D wtemp           ds
+     D  temp                   1      4  0
+     D  temp1                  1      2  0
+     D  temp2                  3      4  0
+     D wdir            ds
+     D  wup                    1      1
+     D  wur                    2      2
+     D  wri                    3      3
+     D  wdr                    4      4
+     D  wdo                    5      5
+     D  wdl                    6      6
+     D  wle                    7      7
+     D  wul                    8      8
+     D wrec            ds
+     D  f01                    1      1
+     D  f02                    2      2
+     D  f03                    3      3
+     D  f04                    4      4
+     D  f05                    5      5
+     D  f06                    6      6
+     D  f07                    7      7
+     D  f08                    8      8
+     D  f09                    9      9
+     D  f10                   10     10
+     D  f11                   11     11
+     D  f12                   12     12
+     D  f13                   13     13
+     D  f14                   14     14
+     D  f15                   15     15
+     D  f16                   16     16
+     D  f17                   17     17
+     D  f18                   18     18
+     D  f19                   19     19
+     D  f20                   20     20
+     D  f21                   21     21
+     D  f22                   22     22
+     D  f23                   23     23
+     D  f24                   24     24
+     D  f25                   25     25
+     D  f26                   26     26
+     D  f27                   27     27
+     D  f28                   28     28
+     D  f29                   29     29
+     D  f30                   30     30
+     D  f31                   31     31
+     D  f32                   32     32
+     D  f33                   33     33
+     D  f34                   34     34
+     D  f35                   35     35
+     D  f36                   36     36
+     D  f37                   37     37
+     D  f38                   38     38
+     D  f39                   39     39
+     D  f40                   40     40
+     D  f41                   41     41
+     D  f42                   42     42
+     D  f43                   43     43
+     D  f44                   44     44
+     D  f45                   45     45
+     D  f46                   46     46
+     D  f47                   47     47
+     D  f48                   48     48
+     D  f49                   49     49
+     D  f50                   50     50
+     D  f51                   51     51
+     D  f52                   52     52
+     D  f53                   53     53
+     D  f54                   54     54
+     D  f55                   55     55
+     D  f56                   56     56
+     D  f57                   57     57
+     D  f58                   58     58
+     D  f59                   59     59
+     D  f60                   60     60
+     D  f61                   61     61
+     D  f62                   62     62
+     D  f63                   63     63
+     D  f64                   64     64
+     D watr            ds
+     D  a01                    1      1
+     D  a02                    2      2
+     D  a03                    3      3
+     D  a04                    4      4
+     D  a05                    5      5
+     D  a06                    6      6
+     D  a07                    7      7
+     D  a08                    8      8
+     D  a09                    9      9
+     D  a10                   10     10
+     D  a11                   11     11
+     D  a12                   12     12
+     D  a13                   13     13
+     D  a14                   14     14
+     D  a15                   15     15
+     D  a16                   16     16
+     D  a17                   17     17
+     D  a18                   18     18
+     D  a19                   19     19
+     D  a20                   20     20
+     D  a21                   21     21
+     D  a22                   22     22
+     D  a23                   23     23
+     D  a24                   24     24
+     D  a25                   25     25
+     D  a26                   26     26
+     D  a27                   27     27
+     D  a28                   28     28
+     D  a29                   29     29
+     D  a30                   30     30
+     D  a31                   31     31
+     D  a32                   32     32
+     D  a33                   33     33
+     D  a34                   34     34
+     D  a35                   35     35
+     D  a36                   36     36
+     D  a37                   37     37
+     D  a38                   38     38
+     D  a39                   39     39
+     D  a40                   40     40
+     D  a41                   41     41
+     D  a42                   42     42
+     D  a43                   43     43
+     D  a44                   44     44
+     D  a45                   45     45
+     D  a46                   46     46
+     D  a47                   47     47
+     D  a48                   48     48
+     D  a49                   49     49
+     D  a50                   50     50
+     D  a51                   51     51
+     D  a52                   52     52
+     D  a53                   53     53
+     D  a54                   54     54
+     D  a55                   55     55
+     D  a56                   56     56
+     D  a57                   57     57
+     D  a58                   58     58
+     D  a59                   59     59
+     D  a60                   60     60
+     D  a61                   61     61
+     D  a62                   62     62
+     D  a63                   63     63
+     D  a64                   64     64
+     +*---------------------------------------------------------------
+     C                   Exsr      init
+     C                   Exsr      head
+     C                   Exsr      slut
+     +*---------------------------------------------------------------
+     C     head          Begsr
+     +*---------------------------------------------------------------
+     C     h001          Tag
+     C                   Exfmt     wbild1
+ 1B  C                   If        *in70  or
+     C                             *in71
+goto C                   Goto      h999
+ 1E  C                   EndIf
+     +* Is it some Save/Load operation?
+ 1B  C                   If        *in72
+     C                   Exsr      savlod
+goto C                   Goto      h001
+ 1E  C                   EndIf
+     +* Move space to errormessage.
+     C                   Move      *all' '       medd
+     C                   Movel     cf            wcf
+     +* Translate CF (WCF actually) to X, Y and W1 (1-64).
+     C                   Exsr      getnr
+     +* Is Enter pressed on a "busy" or "taken" spot?
+     C     x             Occur     waa
+ 1B  C                   If        aa(y) <> ' '
+     C                   Movel     err(1)        medd
+goto C                   Goto      h001
+ 1E  C                   EndIf
+     +* Clear table WORK.
+     C                   Exsr      cwork
+     +* Is there anything to turn for "X"?
+     C                   Eval      want = 0
+     C                   Eval      wtot = 0
+     C                   Clear                   wdir
+     C                   Eval      wtyp = 'O'
+     C                   Eval      wref = 'X'
+     C                   Exsr      chkit
+     +* Wrong "spot". Nothing is "turnable"|
+ 1B  C                   If        wtot = 0
+     C                   Movel     err(8)        medd
+goto C                   Goto      h001
+ 1E  C                   EndIf
+     +*
+     C                   Eval      *in99 = *on
+     +* Turn the computers "X".
+     C                   Eval      wref = 'X'
+     C                   Exsr      turn
+     C                   Exsr      stat
+     +* Is it over?
+ 1B  C                   If        wtot2 = 64
+     C                   Exsr      getmsg
+     C                   Write     wbild1
+     C                   Exsr      wait5
+goto C                   Goto      h999
+ 1E  C                   EndIf
+     +* Did the User win?
+ 1B  C                   If        da = 0
+     C                   Movel     err(3)        medd
+     C                   Write     wbild1
+     C                   Exsr      wait5
+goto C                   Goto      h999
+ 1E  C                   EndIf
+     +* Now, the Computer is going to make its move|
+     C                   Exsr      as400
+     C                   Eval      *in99 = *off
+     +* Is it over?
+ 1B  C                   If        du = 0  or
+     C                             wtot2 = 64
+goto C                   Goto      h999
+ 1E  C                   EndIf
+goto C                   Goto      h001
+     C     h999          Tag
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     as400         Begsr
+     +*---------------------------------------------------------------
+     C     a100          Tag
+     +* Clear table WORK.
+     C                   Exsr      cwork
+     +* Check each and everyone of the 64 spots to see where there
+     +* are any "turnable" positions in all 8 directions.
+     +* Store the "possibilities" in WORK and WDAT.
+     C                   Eval      wx = 1
+     C                   Eval      wy = 1
+     C                   Eval      wtyp = 'X'
+     C                   Eval      wref = 'O'
+     C                   Eval      wantd = 0
+     C                   Exsr      cwdat
+     C     a200          Tag
+     C                   Clear                   wdir
+     C                   Eval      want = 0
+     C                   Eval      wtot = 0
+ 1B  C                   If        a1(wy) = ' '
+     C                   Move      xy(wy)        temp
+     C                   Eval      w1 = wy
+     C                   Eval      x = temp1
+     C                   Eval      y = temp2
+     C                   Exsr      chkit
+ 2B  C                   If        wtot > 0
+     C     wy            Occur     work
+     C                   Eval      ant = wtot
+     C                   Add       wtot          wantd
+     C                   Eval      sts = 'O'
+     C                   Exsr      class
+     C                   Eval      dir = wdir
+     C     wx            Occur     wdat
+     C                   Eval      wd1 = cls
+     C                   Eval      wd2 = ant
+     C                   Eval      wd3 = wy
+     C                   Add       1             wx
+ 2E  C                   EndIf
+ 1E  C                   EndIf
+     C                   Add       1             wy
+ 1B  C                   If        wy < 65
+goto C                   Goto      a200
+ 1E  C                   EndIf
+     +* Was there anything at all to turn?
+ 1B  C                   If        wantd = 0
+     C                   Movel     err(2)        medd
+goto C                   Goto      a999
+ 1E  C                   EndIf
+     C                   Movel     err(4)        medd
+     C                   Exsr      wait1
+     C                   Write     wbild1
+     +* There were positions to turn. Which should we take?
+     +* All possibilities is now in data-area WDAT.
+     C                   Clear                   a2
+     C                   Eval      wy = 0
+ 1B  C                   Do        25            wy
+     C     wy            Occur     wdat
+ 2B  C                   If        wd2 > 0
+     C                   Add       1             a2(wd1)
+ 2E  C                   EndIf
+ 1E  C                   Enddo
+     +* Now we have "classified" them|
+     C                   Exsr      fndbst
+     C                   Exsr      turn
+     C                   Exsr      stat
+ 1B  C                   If        wtot2 = 64
+     C                   Exsr      getmsg
+     C                   Write     wbild1
+     C                   Exsr      wait5
+goto C                   Goto      a999
+ 1E  C                   EndIf
+ 1B  C                   If        du = 0
+     C                   Movel     err(6)        medd
+     C                   Write     wbild1
+     C                   Exsr      wait5
+goto C                   Goto      a999
+ 1E  C                   EndIf
+     C                   Move      *all' '       medd
+     +* Will the User be able to "turn" anything in his next Move
+     +* or does he have to "pass"?
+     C                   Exsr      chkusr
+ 1B  C                   If        wtot = 0
+     C                   Movel     err(5)        medd
+     C                   Write     wbild1
+     C                   Exsr      wait5
+goto C                   Goto      a100
+ 1E  C                   EndIf
+     C     a999          Tag
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     chkusr        Begsr
+     +*---------------------------------------------------------------
+     +* Check if user must "pass"|
+     C                   Eval      wtot = 0
+     C                   Eval      wx = 1
+     C                   Eval      wy = 1
+     C                   Eval      wtyp = 'O'
+     C                   Eval      wref = 'X'
+     C     c100          Tag
+     C                   Clear                   wdir
+     C                   Eval      want = 0
+ 1B  C                   If        a1(wy) = ' '
+     C                   Move      xy(wy)        temp
+     C                   Eval      w1 = wy
+     C                   Eval      x = temp1
+     C                   Eval      y = temp2
+     C                   Exsr      chkit
+ 1E  C                   EndIf
+     C                   Add       1             wy
+ 1B  C                   If        wy < 65
+goto C                   Goto      c100
+ 1E  C                   EndIf
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     fndbst        Begsr
+     +*---------------------------------------------------------------
+     +* Find best W1, X and Y.
+     C                   Eval      w1 = 0
+     C                   Eval      want = 0
+ 1B  C                   If        a2(9) > 0
+ 2B  C                   Do        25            wy
+     C     wy            Occur     wdat
+ 3B  C                   If        wd1 = 9
+ 4B  C                   If        wd2 > want
+     C                   Eval      want = wd2
+     C                   Move      wd3           w1
+ 4E  C                   EndIf
+ 3E  C                   EndIf
+ 2E  C                   Enddo
+goto C                   Goto      c800
+ 1E  C                   EndIf
+ 1B  C                   If        a2(7) > 0
+ 2B  C                   Do        25            wy
+     C     wy            Occur     wdat
+ 3B  C                   If        wd1 = 7
+ 4B  C                   If        wd2 > want
+     C                   Eval      want = wd2
+     C                   Move      wd3           w1
+ 4E  C                   EndIf
+ 3E  C                   EndIf
+ 2E  C                   Enddo
+goto C                   Goto      c800
+ 1E  C                   EndIf
+ 1B  C                   If        a2(5) > 0
+ 2B  C                   Do        25            wy
+     C     wy            Occur     wdat
+ 3B  C                   If        wd1 = 5
+ 4B  C                   If        wd2 > want
+     C                   Eval      want = wd2
+     C                   Move      wd3           w1
+ 4E  C                   EndIf
+ 3E  C                   EndIf
+ 2E  C                   Enddo
+goto C                   Goto      c800
+ 1E  C                   EndIf
+ 1B  C                   If        a2(1) > 0
+ 2B  C                   Do        25            wy
+     C     wy            Occur     wdat
+ 3B  C                   If        wd1 = 1
+ 4B  C                   If        wd2 > want
+     C                   Eval      want = wd2
+     C                   Move      wd3           w1
+ 4E  C                   EndIf
+ 3E  C                   EndIf
+ 2E  C                   Enddo
+ 1E  C                   EndIf
+     C     c800          Tag
+     C     w1            Occur     work
+     C                   Clear                   wdir
+     C                   Eval      wdir = dir
+     C                   Move      xy(w1)        temp
+     C                   Eval      x = temp1
+     C                   Eval      y = temp2
+     C     c999          Tag
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     class         Begsr
+     +*---------------------------------------------------------------
+     +* Classify moves|
+     C                   Move      5             cls
+ 1B  C                   If        wy = 1  or
+     C                             wy = 8  or
+     C                             wy = 57  or
+     C                             wy = 64
+     C                   Move      9             cls
+ 1E  C                   EndIf
+     +*
+ 1B  C                   If        wy = 2  and
+     C                             a1(1) = ' '  and
+     C                             a1(3) = 'X'
+     C                   Move      1             cls
+ 1E  C                   EndIf
+ 1B  C                   If        wy = 7  and
+     C                             a1(8) = ' '  and
+     C                             a1(6) = 'X'
+     C                   Move      1             cls
+ 1E  C                   EndIf
+ 1B  C                   If        wy = 9  and
+     C                             a1(1) = ' '  and
+     C                             a1(17) = 'X'
+     C                   Move      1             cls
+ 1E  C                   EndIf
+ 1B  C                   If        wy = 10  and
+     C                             a1(1) = ' '  and
+     C                             a1(19) = 'X'
+     C                   Move      1             cls
+ 1E  C                   EndIf
+ 1B  C                   If        wy = 15  and
+     C                             a1(8) = ' '  and
+     C                             a1(22) = 'X'
+     C                   Move      1             cls
+ 1E  C                   EndIf
+ 1B  C                   If        wy = 16  and
+     C                             a1(8) = ' '  and
+     C                             a1(24) = 'X'
+     C                   Move      1             cls
+ 1E  C                   EndIf
+ 1B  C                   If        wy = 49  and
+     C                             a1(57) = ' '  and
+     C                             a1(41) = 'X'
+     C                   Move      1             cls
+ 1E  C                   EndIf
+ 1B  C                   If        wy = 50  and
+     C                             a1(57) = ' '  and
+     C                             a1(43) = 'X'
+     C                   Move      1             cls
+ 1E  C                   EndIf
+ 1B  C                   If        wy = 55  and
+     C                             a1(64) = ' '  and
+     C                             a1(46) = 'X'
+     C                   Move      1             cls
+ 1E  C                   EndIf
+ 1B  C                   If        wy = 56  and
+     C                             a1(64) = ' '  and
+     C                             a1(48) = 'X'
+     C                   Move      1             cls
+ 1E  C                   EndIf
+ 1B  C                   If        wy = 58  and
+     C                             a1(57) = ' '  and
+     C                             a1(59) = 'X'
+     C                   Move      1             cls
+ 1E  C                   EndIf
+ 1B  C                   If        wy = 63  and
+     C                             a1(64) = ' '  and
+     C                             a1(62) = 'X'
+     C                   Move      1             cls
+ 1E  C                   EndIf
+     +*
+ 1B  C                   If        wy = 3  or
+     C                             wy = 4  or
+     C                             wy = 5  or
+     C                             wy = 6  or
+     C                             wy = 17  or
+     C                             wy = 24  or
+     C                             wy = 25  or
+     C                             wy = 32  or
+     C                             wy = 33  or
+     C                             wy = 40  or
+     C                             wy = 41  or
+     C                             wy = 48  or
+     C                             wy = 59  or
+     C                             wy = 60  or
+     C                             wy = 61  or
+     C                             wy = 62
+     C                   Move      7             cls
+ 1E  C                   EndIf
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     chkit         Begsr
+     +*---------------------------------------------------------------
+     +* Upwards?
+     C                   Eval      wtal1 = -1
+     C                   Eval      wtal2 = 0
+     C                   Exsr      fndtrn
+     C                   Eval      wup = wriktn
+     C     w1            Occur     work
+     C                   Add       want          ant
+     C                   Add       want          wtot
+     C                   Eval      want = 0
+     +* Upwards to the right?
+     C                   Eval      wtal1 = -1
+     C                   Eval      wtal2 = 1
+     C                   Exsr      fndtrn
+     C                   Eval      wur = wriktn
+     C     w1            Occur     work
+     C                   Add       want          ant
+     C                   Add       want          wtot
+     C                   Eval      want = 0
+     +* To the right?
+     C                   Eval      wtal1 = 0
+     C                   Eval      wtal2 = 1
+     C                   Exsr      fndtrn
+     C                   Eval      wri = wriktn
+     C     w1            Occur     work
+     C                   Add       want          ant
+     C                   Add       want          wtot
+     C                   Eval      want = 0
+     +* Downwards to the right?
+     C                   Eval      wtal1 = 1
+     C                   Eval      wtal2 = 1
+     C                   Exsr      fndtrn
+     C                   Eval      wdr = wriktn
+     C     w1            Occur     work
+     C                   Add       want          ant
+     C                   Add       want          wtot
+     C                   Eval      want = 0
+     +* Downwards?
+     C                   Eval      wtal1 = 1
+     C                   Eval      wtal2 = 0
+     C                   Exsr      fndtrn
+     C                   Eval      wdo = wriktn
+     C     w1            Occur     work
+     C                   Add       want          ant
+     C                   Add       want          wtot
+     C                   Eval      want = 0
+     +* Downwards to the left?.
+     C                   Eval      wtal1 = 1
+     C                   Eval      wtal2 = -1
+     C                   Exsr      fndtrn
+     C                   Eval      wdl = wriktn
+     C     w1            Occur     work
+     C                   Add       want          ant
+     C                   Add       want          wtot
+     C                   Eval      want = 0
+     +* To the left?
+     C                   Eval      wtal1 = 0
+     C                   Eval      wtal2 = -1
+     C                   Exsr      fndtrn
+     C                   Eval      wle = wriktn
+     C     w1            Occur     work
+     C                   Add       want          ant
+     C                   Add       want          wtot
+     C                   Eval      want = 0
+     +* Upwards to the left?
+     C                   Eval      wtal1 = -1
+     C                   Eval      wtal2 = -1
+     C                   Exsr      fndtrn
+     C                   Eval      wul = wriktn
+     C     w1            Occur     work
+     C                   Add       want          ant
+     C                   Add       want          wtot
+     C                   Eval      want = 0
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     wait1         Begsr
+     +*---------------------------------------------------------------
+     +* Wait one second...
+     C                   Call      'QCMDEXC'
+     C                   Parm                    cmda
+     C                   Parm                    lena
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     wait5         Begsr
+     +*---------------------------------------------------------------
+     +* Wait 5 seconds...
+     C                   Call      'QCMDEXC'
+     C                   Parm                    cmdb
+     C                   Parm                    lena
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     turn          Begsr
+     +*---------------------------------------------------------------
+     +* Turn positions to whatever is in WREF|
+     +* Start with the one that X and Y (and W1) is pointing to|
+     C                   Eval      a1(w1) = wref
+     C                   Eval      *in(w1) = *on
+     C                   Movea     a1            wrec
+     C                   Eval      d1 = w1
+     C                   Exsr      dspatr
+     C     x             Occur     waa
+     C                   Eval      aa(y) = wref
+     C                   Exsr      wait1
+     C                   Write     wbild1
+     +* Anything upwards to be turned?
+ 1B  C                   If        wup = 'Y'
+     C                   Eval      wx = x
+     C                   Eval      wy = y
+     C                   Eval      wtal1 = -1
+     C                   Eval      wtal2 = 0
+     C                   Exsr      turnit
+ 1E  C                   EndIf
+     +* Anything upwards to the right to be turned?
+ 1B  C                   If        wur = 'Y'
+     C                   Eval      wx = x
+     C                   Eval      wy = y
+     C                   Eval      wtal1 = -1
+     C                   Eval      wtal2 = 1
+     C                   Exsr      turnit
+ 1E  C                   EndIf
+     +* Anything to the right to be turned?
+ 1B  C                   If        wri = 'Y'
+     C                   Eval      wx = x
+     C                   Eval      wy = y
+     C                   Eval      wtal1 = 0
+     C                   Eval      wtal2 = 1
+     C                   Exsr      turnit
+ 1E  C                   EndIf
+     +* Anything downwards to the right to be turned?
+ 1B  C                   If        wdr = 'Y'
+     C                   Eval      wx = x
+     C                   Eval      wy = y
+     C                   Eval      wtal1 = 1
+     C                   Eval      wtal2 = 1
+     C                   Exsr      turnit
+ 1E  C                   EndIf
+     +* Anything downwards to be turned?
+ 1B  C                   If        wdo = 'Y'
+     C                   Eval      wx = x
+     C                   Eval      wy = y
+     C                   Eval      wtal1 = 1
+     C                   Eval      wtal2 = 0
+     C                   Exsr      turnit
+ 1E  C                   EndIf
+     +* Anything downwards to the left to be turned?
+ 1B  C                   If        wdl = 'Y'
+     C                   Eval      wx = x
+     C                   Eval      wy = y
+     C                   Eval      wtal1 = 1
+     C                   Eval      wtal2 = -1
+     C                   Exsr      turnit
+ 1E  C                   EndIf
+     +* Anything to the left to be turned?
+ 1B  C                   If        wle = 'Y'
+     C                   Eval      wx = x
+     C                   Eval      wy = y
+     C                   Eval      wtal1 = 0
+     C                   Eval      wtal2 = -1
+     C                   Exsr      turnit
+ 1E  C                   EndIf
+     +* Anything upwards to the left to be turned?
+ 1B  C                   If        wul = 'Y'
+     C                   Eval      wx = x
+     C                   Eval      wy = y
+     C                   Eval      wtal1 = -1
+     C                   Eval      wtal2 = -1
+     C                   Exsr      turnit
+ 1E  C                   EndIf
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     turnit        Begsr
+     +*---------------------------------------------------------------
+     +* Turn the opponents positions, one at the time|
+ 1B  C                   Do        6
+     C                   Add       wtal1         wx
+     C                   Add       wtal2         wy
+     C     wx            Occur     waa
+ 2B  C                   If        aa(wy) <> wtyp
+ 1L  C                   Leave
+ 2E  C                   EndIf
+     C                   Eval      aa(wy) = wref
+     C                   Eval      temp1 = wx
+     C                   Eval      temp2 = wy
+     C                   Eval      wz = 1
+     C     temp          Lookup    xy(wz)                                 80
+     C                   Eval      a1(wz) = wref
+     C                   Eval      *in(wz) = *on
+     C                   Movea     a1            wrec
+     C                   Eval      d1 = wz
+     C                   Exsr      dspatr
+     C                   Exsr      wait1
+     C                   Write     wbild1
+ 1E  C                   Enddo
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     dspatr        Begsr
+     +*---------------------------------------------------------------
+     +* Put right attribute on the turned positions|
+ 1B  C                   Select
+ 1X  C                   When      wref = 'X'
+     C                   Eval      at1(d1) = hexx
+ 1X  C                   When      wref = 'O'
+     C                   Eval      at1(d1) = hexo
+ 1E  C                   Endsl
+     C                   Movea     at1           watr
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     fndtrn        Begsr
+     +*---------------------------------------------------------------
+     +* Was there anything to turn?
+     C                   Eval      wriktn = *blanks
+     C                   Eval      x1 = x
+     C                   Eval      y1 = y
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 1B  C                   If        aa(y1) <> wtyp
+goto C                   Goto      f999
+ 1E  C                   EndIf
+     +*
+ 1B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 2B  C                   If        aa(y1) = wref
+     C                   Eval      wriktn = 'Y'
+     C                   Add       1             want
+ 2E  C                   EndIf
+ 1E  C                   EndIf
+     +*
+     C                   Eval      x1 = x
+     C                   Eval      y1 = y
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 1B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 2B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 3B  C                   If        aa(y1) = wref
+     C                   Eval      wriktn = 'Y'
+     C                   Add       2             want
+ 3E  C                   EndIf
+ 2E  C                   EndIf
+ 1E  C                   EndIf
+     +*
+     C                   Eval      x1 = x
+     C                   Eval      y1 = y
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 1B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 2B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 3B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 4B  C                   If        aa(y1) = wref
+     C                   Eval      wriktn = 'Y'
+     C                   Add       3             want
+ 4E  C                   EndIf
+ 3E  C                   EndIf
+ 2E  C                   EndIf
+ 1E  C                   EndIf
+     +*
+     C                   Eval      x1 = x
+     C                   Eval      y1 = y
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 1B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 2B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 3B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 4B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 5B  C                   If        aa(y1) = wref
+     C                   Eval      wriktn = 'Y'
+     C                   Add       4             want
+ 5E  C                   EndIf
+ 4E  C                   EndIf
+ 3E  C                   EndIf
+ 2E  C                   EndIf
+ 1E  C                   EndIf
+     +*
+     C                   Eval      x1 = x
+     C                   Eval      y1 = y
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 1B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 2B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 3B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 4B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 5B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 6B  C                   If        aa(y1) = wref
+     C                   Eval      wriktn = 'Y'
+     C                   Add       5             want
+ 6E  C                   EndIf
+ 5E  C                   EndIf
+ 4E  C                   EndIf
+ 3E  C                   EndIf
+ 2E  C                   EndIf
+ 1E  C                   EndIf
+     +*
+     C                   Eval      x1 = x
+     C                   Eval      y1 = y
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 1B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 2B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 3B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 4B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 5B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 6B  C                   If        aa(y1) = wtyp
+     C                   Add       wtal1         x1
+     C                   Add       wtal2         y1
+     C     x1            Occur     waa
+ 7B  C                   If        aa(y1) = wref
+     C                   Eval      wriktn = 'Y'
+     C                   Add       6             want
+ 7E  C                   EndIf
+ 6E  C                   EndIf
+ 5E  C                   EndIf
+ 4E  C                   EndIf
+ 3E  C                   EndIf
+ 2E  C                   EndIf
+ 1E  C                   EndIf
+     +*
+     C     f999          Tag
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     getnr         Begsr
+     +*---------------------------------------------------------------
+     +* Look up the current X, Y and W1.
+     C                   Eval      wx = 1
+     C     wcf           Lookup    fxx(wx)                                80
+     C                   Move      xy(wx)        temp
+     C                   Eval      x = temp1
+     C                   Eval      y = temp2
+     C                   Eval      w1 = wx
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     savlod        Begsr
+     +*---------------------------------------------------------------
+     +* Someone will Save / Load a game|
+     C     s100          Tag
+     C                   Eval      fkey = user
+     +* Is the User known?
+     C     fkey          Chain     rec                                73
+ 1B  C                   If        *in73
+     C                   Movel     'Free'        fnam1
+     C                   Movel     'Free'        fnam2
+     C                   Movel     'Free'        fnam3
+     C                   Movel     'Free'        fnam4
+     C                   Movel     'Free'        fnam5
+     C                   Movel     '1'           fnr1
+     C                   Movel     '2'           fnr2
+     C                   Movel     '3'           fnr3
+     C                   Movel     '4'           fnr4
+     C                   Movel     '5'           fnr5
+ 1E  C                   EndIf
+     C     s200          Tag
+     C                   Eval      *in75 = *off
+     C                   Eval      *in76 = *off
+     C                   Eval      val1 = *blanks
+     C                   Eval      nr = *blanks
+     C                   Eval      ben = *blanks
+     C                   Write     wdwfts
+     C                   Exfmt     save
+ 1B  C                   If        *in71
+goto C                   Goto      s999
+ 1E  C                   EndIf
+     +* Should it be Save or Load?
+ 1B  C                   Select
+ 1X  C                   When      val1 = 'S'
+     C                   Exsr      sav
+ 1X  C                   When      val1 = 'L'
+     C                   Exsr      lod
+ 1X  C                   other
+goto C                   Goto      s200
+ 1E  C                   Endsl
+     C     s999          Tag
+     C                   Write     wdwftr
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     sav           Begsr
+     +*---------------------------------------------------------------
+     +* Save the current game.
+     C                   Eval      *in75 = *on
+     C                   Eval      *in76 = *on
+     C                   Eval      *in77 = *off
+     C     sa20          Tag
+     C                   Exfmt     save
+ 1B  C                   If        *in71
+goto C                   Goto      sa99
+ 1E  C                   EndIf
+     C                   Eval      *in77 = *off
+     +*
+ 1B  C                   Select
+ 1X  C                   When      nr = '1'
+     C                   Eval      fnam1 = ben
+     C                   Eval      fst1 = 'Y'
+     C                   Movea     a1            fpos1
+     C                   Movea     at1           fatr1
+ 1X  C                   When      nr = '2'
+     C                   Eval      fnam2 = ben
+     C                   Eval      fst2 = 'Y'
+     C                   Movea     a1            fpos2
+     C                   Movea     at1           fatr2
+ 1X  C                   When      nr = '3'
+     C                   Eval      fnam3 = ben
+     C                   Eval      fst3 = 'Y'
+     C                   Movea     a1            fpos3
+     C                   Movea     at1           fatr3
+ 1X  C                   When      nr = '4'
+     C                   Eval      fnam4 = ben
+     C                   Eval      fst4 = 'Y'
+     C                   Movea     a1            fpos4
+     C                   Movea     at1           fatr4
+ 1X  C                   When      nr = '5'
+     C                   Eval      fnam5 = ben
+     C                   Eval      fst5 = 'Y'
+     C                   Movea     a1            fpos5
+     C                   Movea     at1           fatr5
+ 1X  C                   other
+     C                   Eval      *in77 = *on
+goto C                   Goto      sa20
+ 1E  C                   Endsl
+ 1B  C                   If        ben = *blanks
+     C                   Eval      *in77 = *on
+goto C                   Goto      sa20
+ 1E  C                   EndIf
+     C                   update    rec                                  79
+ 1B  C                   If        *in79
+     C                   Write     rec
+ 1E  C                   EndIf
+     C     sa99          Tag
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     lod           Begsr
+     +*---------------------------------------------------------------
+     +* Load a previously Saved Game.
+     C                   Eval      *in75 = *on
+     C                   Eval      *in76 = *off
+     C                   Eval      *in77 = *off
+     C     lo20          Tag
+     C                   Exfmt     save
+ 1B  C                   If        *in71
+goto C                   Goto      lo99
+ 1E  C                   EndIf
+     C                   Eval      *in77 = *off
+ 1B  C                   Select
+ 1X  C                   When      nr = '1'  and
+     C                             fst1 = 'Y'
+     C                   Movea     fpos1         a1
+     C                   Movea     fatr1         at1
+ 1X  C                   When      nr = '2'  and
+     C                             fst2 = 'Y'
+     C                   Movea     fpos2         a1
+     C                   Movea     fatr2         at1
+ 1X  C                   When      nr = '3'  and
+     C                             fst3 = 'Y'
+     C                   Movea     fpos3         a1
+     C                   Movea     fatr3         at1
+ 1X  C                   When      nr = '4'  and
+     C                             fst4 = 'Y'
+     C                   Movea     fpos4         a1
+     C                   Movea     fatr4         at1
+ 1X  C                   When      nr = '5'  and
+     C                             fst5 = 'Y'
+     C                   Movea     fpos5         a1
+     C                   Movea     fatr5         at1
+ 1X  C                   other
+     C                   Eval      *in77 = *on
+goto C                   Goto      lo20
+ 1E  C                   Endsl
+     C                   Clear                   wrec
+     C                   Clear                   wdir
+     C                   Movea     at1           watr
+     C                   Movea     a1            wrec
+     C                   Exsr      cwork
+     C                   Exsr      cwaa
+     C                   Eval      wx = 0
+ 1B  C                   Do        64            wx
+ 2B  C                   If        a1(wx) = ' '
+     C                   Eval      *in(wx) = *off
+ 2X  C                   Else
+     C                   Eval      *in(wx) = *on
+ 2E  C                   EndIf
+     C                   Move      xy(wx)        temp
+     C                   Eval      x = temp1
+     C                   Eval      y = temp2
+     C     x             Occur     waa
+     C                   Eval      aa(y) = a1(wx)
+ 1E  C                   Enddo
+     C                   Exsr      stat
+     C     lo99          Tag
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     stat          Begsr
+     +*---------------------------------------------------------------
+     +* Check who is leading|
+     C                   Eval      du = 0
+     C                   Eval      da = 0
+     C                   Eval      wx = 0
+ 1B  C                   Do        64            wx
+ 2B  C                   If        a1(wx) = 'X'
+     C                   Add       1             du
+ 2E  C                   EndIf
+ 2B  C                   If        a1(wx) = 'O'
+     C                   Add       1             da
+ 2E  C                   EndIf
+ 1E  C                   Enddo
+     C                   Eval      wtot2 = da
+     C                   Add       du            wtot2
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     cwork         Begsr
+     +*---------------------------------------------------------------
+     +* Clear WORK.
+ 1B  C                   Do        64            wc1
+     C     wc1           Occur     work
+     C                   Clear                   work
+ 1E  C                   Enddo
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     cwdat         Begsr
+     +*---------------------------------------------------------------
+     +* Clear WDAT.
+ 1B  C                   Do        25            wc1
+     C     wc1           Occur     wdat
+     C                   Clear                   wdat
+ 1E  C                   Enddo
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     cwaa          Begsr
+     +*---------------------------------------------------------------
+     +* Clear WAA.
+ 1B  C                   Do        25            wc1
+     C     wc1           Occur     waa
+     C                   Clear                   waa
+     C                   Clear                   aa(wc1)
+ 1E  C                   Enddo
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     init          Begsr
+     +*---------------------------------------------------------------
+     +* Here it all begins|
+     C                   Clear                   a1
+     C                   Exsr      cwork
+     C                   Exsr      cwaa
+     C                   Clear                   wrec
+     C                   Clear                   wdir
+     C                   Eval      x = 0
+     C                   Eval      y = 0
+     C                   Eval      x1 = 0
+     C                   Eval      y1 = 0
+     C                   Eval      w1 = 0
+     C                   Eval      d1 = 0
+     C                   Eval      wc1 = 0
+     C                   Eval      want = 0
+     C                   Eval      wantd = 0
+     C                   Eval      wtot = 0
+     C                   Eval      wtot2 = 0
+     C                   Eval      wx = 0
+     C                   Eval      wy = 0
+     C                   Eval      wz = 0
+     C                   Eval      wtal1 = 0
+     C                   Eval      wtal2 = 0
+     C                   Movel     cmd1          cmda
+     C                   Movel     cmd2          cmdb
+     C                   Eval      lena = 15
+     C                   Eval      wcf = *blanks
+     C                   Eval      wtyp = *blanks
+     C                   Eval      wref = *blanks
+     C                   Eval      wriktn = *blanks
+     C                   Eval      hexo = *blanks
+     C                   Eval      hexx = *blanks
+     C     jobnam        Post      oth400d
+ 1B  C                   If        devd = '3477FC'  or
+     C                             devd = '3487HC'  or
+     C                             devd = '3197C1'  or
+     C                             devd = '317902'
+     C                   Move      hexa8         hexx
+     C                   Move      hexb8         hexo
+     C                   Move      hexa8         ax
+     C                   Move      hexb8         ao
+ 1X  C                   Else
+     C                   Move      hexa2         hexo
+     C                   Move      hexa3         hexx
+     C                   Move      hexa2         ao
+     C                   Move      hexa3         ax
+ 1E  C                   EndIf
+     C                   Eval      dux = 'X'
+     C                   Eval      dao = 'O'
+     C                   Eval      f28 = 'X'
+     C                   Eval      f29 = 'O'
+     C                   Eval      f36 = 'O'
+     C                   Eval      f37 = 'X'
+     C                   Eval      *in28 = *on
+     C                   Eval      *in29 = *on
+     C                   Eval      *in36 = *on
+     C                   Eval      *in37 = *on
+     C                   Eval      a28 = hexx
+     C                   Eval      a29 = hexo
+     C                   Eval      a36 = hexo
+     C                   Eval      a37 = hexx
+     C     14            Occur     waa
+     C                   Eval      aa(14) = f28
+     C                   Eval      aa(15) = f29
+     C     15            Occur     waa
+     C                   Eval      aa(14) = f36
+     C                   Eval      aa(15) = f37
+     C                   Movea     wrec          a1
+     C                   Movea     watr          at1
+     +* Check who is leading|
+     C                   Exsr      stat
+     +* Put out the first screen.
+     C                   Write     wdwftr
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     getmsg        Begsr
+     +*---------------------------------------------------------------
+     +* Here we get if all positions are busy|
+     C                   Movel     err(7)        medd
+ 1B  C                   If        du > da
+     C                   Movel     err(3)        medd
+ 1E  C                   EndIf
+ 1B  C                   If        da > du
+     C                   Movel     err(6)        medd
+ 1E  C                   EndIf
+     C                   Endsr
+     +*---------------------------------------------------------------
+     C     slut          Begsr
+     +*---------------------------------------------------------------
+     C                   Eval      *inlr = *on
+     C                   Endsr
+** Array ERR
+This one is occupied| choose another one|
+I pass| Your turn next...
+You won, I'll be back...
+Now the AS is making its move. Watch it...
+Oh, my Move again, thank You...
+I won| Better luck next time|
+Oops, dead race|
+You can not turn any "O" there can You?
+** Array FXX
+F01
+F02
+F03
+F04
+F05
+F06
+F07
+F08
+F09
+F10
+F11
+F12
+F13
+F14
+F15
+F16
+F17
+F18
+F19
+F20
+F21
+F22
+F23
+F24
+F25
+F26
+F27
+F28
+F29
+F30
+F31
+F32
+F33
+F34
+F35
+F36
+F37
+F38
+F39
+F40
+F41
+F42
+F43
+F44
+F45
+F46
+F47
+F48
+F49
+F50
+F51
+F52
+F53
+F54
+F55
+F56
+F57
+F58
+F59
+F60
+F61
+F62
+F63
+F64
+** Array XY
+1111
+1112
+1113
+1114
+1115
+1116
+1117
+1118
+1211
+1212
+1213
+1214
+1215
+1216
+1217
+1218
+1311
+1312
+1313
+1314
+1315
+1316
+1317
+1318
+1411
+1412
+1413
+1414
+1415
+1416
+1417
+1418
+1511
+1512
+1513
+1514
+1515
+1516
+1517
+1518
+1611
+1612
+1613
+1614
+1615
+1616
+1617
+1618
+1711
+1712
+1713
+1714
+1715
+1716
+1717
+1718
+1811
+1812
+1813
+1814
+1815
+1816
+1817
+1818

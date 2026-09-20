@@ -1,0 +1,16 @@
+Name:		Slot Machine
+
+Author:         Shankar Narayan (Shankar@aimcornet.com)
+
+Objects:        SLOTDF		Display file
+                SLOTPGM         RPG/400 Program
+
+To Create:      Compile the display file SLOTDF first, and then RPG/400 program
+		SLOTPGM.
+
+Object:	        Win credits by matching like bars horizontally or diagonally.
+
+To Start:	CALL SLOTPGM
+
+Play:		Bet from 1-3 credits and press enter.  Watch the bars spin.
+		Wheee|  As much fun as Vegas, but less costly.

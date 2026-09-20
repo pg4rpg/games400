@@ -1,0 +1,18 @@
+Name:		Brick-a-Spell
+
+Author:         Bengt Persson (bepeo@home.se)
+
+Objects:	BRICKD		Display file
+                BRICKR		RPG/400 Program
+
+To Create:      Compile the display file BRICKD first, and then RPG/400
+                program BRICKR.
+
+Object:	        The object of the BRICKR game is to arrange the letters in a
+		pattern from A-O from left to right, top to bottom.
+
+To Start:	CALL BRICKR
+
+Play:		You can only move letters that are adjacent to the blank space.
+		Place the curser on the letter that you wish to move and press
+		enter.

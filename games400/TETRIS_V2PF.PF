@@ -1,0 +1,5 @@
+                R V2R                       TEXT('RECORD INFO')
+                  V2SCR          5 00       TEXT('SCORE')
+                  V2NAME        20          TEXT('NAME')
+                  V2DATE        21          TEXT('DATE')
+                  V2USED         5  0       TEXT('USED FLAG')

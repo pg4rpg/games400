@@ -1,0 +1,23 @@
+Name:		Mines
+
+Author:         Linda Ales (linda@its.cz)
+
+Objects:        MINESW         Display file
+                MINES          COBOL/400 Program
+
+To Create:      Compile the display file MINESW first, and then COBOL/400
+                program MINES.
+
+Object:	        The object of the MINES game is to safely cross the battle
+		field without stepping on a land mine.
+
+To Start:	CALL MINES
+
+Play:		The Player begins at the center of the bottom row on the screen
+		(represented by an 'O').  Use numeric keys 1,2,3,5 to move the 'O'
+		around the screen.  '1' = Right, '2' = Down, '3' = Left, and '5'
+		= Up.
+		Text in the upper right hand corner displays the number of mines
+		adjacent to your current position.
+		Aid keys F10 and F11 show the current position of mines.
+		Enter and space activate a dummy WRKSPLF command (the Boss key).

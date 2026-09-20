@@ -1,0 +1,22 @@
+/* CL program:  ZZn007003                                                     */
+/* Description: Compiles the code uploaded from file n007003.bdl              */
+/*              'Mastermind/400'                                              */
+
+PGM
+
+    MONMSG  CPF0000  EXEC(GOTO ERRPRC)
+
+    CRTDSPF FILE(GAMES400/MM400D) SRCFILE(GAMES400/N007003)
+    MONMSG CPF0000
+
+    CRTCLPGM PGM(GAMES400/MM400C) SRCFILE(GAMES400/N007003)
+    MONMSG CPF0000
+
+    CRTRPGPGM PGM(GAMES400/MM400) SRCFILE(GAMES400/N007003) SRCMBR(MM400)
+    MONMSG CPF0000
+
+    RETURN
+
+ERRPRC:
+    DMPCLPGM
+ENDPGM

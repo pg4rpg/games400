@@ -1,0 +1,1252 @@
+      *======================================================
+      /TITLE --- FILES ---
+      *------------------------------------------------------
+     FV2PF    UF  E                    DISK                      A
+     FV2DF    CF  E                    WORKSTN
+     F                                              KNUM        1
+     F                                              KINFDS F$$
+      *======================================================
+      /TITLE --- EXTENSIONS ---
+      *------------------------------------------------------
+      ****************************************************
+      * A (30x18) - main glass on the screen (visible)   *
+      ****************************************************
+     E                    #A1        30  1               :from :curr
+     E                    #A2        30  1               :to
+     E                    #AO        18 30               :all rows
+      *
+      ****************************************************
+      * B (4x4) - glass where is built new look after    *
+      *             action with the piece (work glass)   *
+      ****************************************************
+     E                    #B1         4  1               :R:curr
+     E                    #BO         4  4               :R:all rows
+      *
+      ****************************************************
+      * C (4x4) - glass where is stored image            *
+      *             of current piece after creating      *
+      ****************************************************
+     E                    #C1         4  1               :F:curr
+     E                    #CO         4  4               :F:all rows
+      *
+      ****************************************************
+      * V (4x4) - glass where is stored current piece    *
+      *             after rotate (temporary)             *
+      ****************************************************
+     E                    #V1         4  1               :V:curr
+     E                    #VO         4  4               :V:all rows
+      *
+      ****************************************************
+      * T (4x4) - glass where is stored piece            *
+      *             for testing  (temporary)             *
+      ****************************************************
+     E                    #T1         4  1               :T:curr
+     E                    #TO         4  4               :T:all rows
+      ****************************************************
+      * F (18x15) - array for initialize  piece          *
+      *             while creating ( 17,18 pos - sizes)  *
+      ****************************************************
+     E                    #F1        18  1               :F:curr
+     E                    #FO     1  15 18               :F:all rows
+      *
+      ****************************************************
+      * zeros and 1's arrays of various lengths          *
+      ****************************************************
+     E                    #Z2    20  20  1               :zeros
+     E                    #O2    20  20  1               :1's
+     E                    #O6     6   6  1               :1's
+      *======================================================
+      /TITLE --- DATA ---
+      *------------------------------------------------------
+     I            DS
+     I                                        1  14 #TALL
+     I                                        1   2 #TTHH
+     I                                        3   4 #TTMM
+     I                                        5   6 #TTSS
+     I                                        7   8 #TDMM
+     I                                        9  10 #TDDD
+     I                                       11  14 #TDYY
+     I           IDS
+     I I                                      1  21 #OALL
+     I I                                      1   2 #OTHH
+     I I            ':'                       3   3 #S1
+     I I                                      4   5 #OTMM
+     I I            ':'                       6   6 #S2
+     I I                                      7   8 #OTSS
+     I I            '   '                     9  11 #S3
+     I I                                     12  13 #ODMM
+     I I            '.'                      14  14 #S4
+     I I                                     15  16 #ODDD
+     I I            '.'                      17  17 #S5
+     I I                                     18  21 #ODYY
+      *------------------------------------------------------
+     IF$$         DS
+     I                                      369 369 F#KEY
+      *------------------------------------------------------
+     I@PSDS      SDS
+     I                                     *PROGRAM MSGPQ
+      *------------------------------------------------------
+     I              X'33'                 C         C#F03
+     I              X'35'                 C         C#F05
+     I              X'36'                 C         C#F06
+     I              X'37'                 C         C#F07
+     I              X'38'                 C         C#F08
+     I              X'39'                 C         C#F09
+     I              X'3C'                 C         C#F12
+     I              X'F1'                 C         C#ENTR
+      *------------------------------------------------------
+     I              'O'                   C         C#CHR
+     I              'OO'                  C         C#DCH
+     I              1                     C         C#1
+     I              30                    C         C#2
+     I              15                    C         C#3
+     I              4                     C         C#10
+     I              3                     C         C#9
+     I              1                     C         C#R1
+     I              18                    C         C#R2
+     I              1                     C         C#SR
+     I              5                     C         C#SC
+      *------------------------------------------------------
+      *======================================================
+      /TITLE --- CALCULATIONS ---
+      *------------------------------------------------------
+      *
+      *@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+      *------------------- MAIN ROUTINE ---------------------
+      *@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+      * #D - VARIABLE FOR INDEX *IN ARRAY
+      *------------------------------------------------------
+     C           *NAMVAR   DEFN           #D      20
+      *
+     C           LBRST     TAG
+     C                     EXSR SB1001                     init
+      *
+     C           LBINV     TAG
+     C                     EXSR SB1200                     get time
+     C                     EXSR SB1201                     put time
+      *
+     C   20                EXSR SB3600                     create
+      *
+     C           59        ADD  #L        #D      20       1st row ovr
+     C                     MOVEA#O6       *IN,#D           6 rows  ovr
+      *
+     C                     EXSR SB3101                     down
+     C   22                EXSR SB2100                     redraw
+      *
+     C                     MOVE *ON       *IN50            invite
+     C                     WRITEV200                   51
+      *
+     C                     MOVEA#Z2       *IN,59           noovrdta all
+      *
+      *
+      *
+     C           LBRED     TAG
+     C                     READ V2DF                   5253
+     C   52                GOTO LBINV                      err=>cycle
+      *
+     C           C#F03     CASEQF#KEY     SB9999           exit
+     C           C#F12     CASEQF#KEY     SB1100           reset
+     C           C#F05     CASEQF#KEY     SB3200           left-max
+     C           C#F06     CASEQF#KEY     SB3201           left
+     C           C#F07     CASEQF#KEY     SB3301           right
+     C           C#F08     CASEQF#KEY     SB3300           right-max
+     C           C#F09     CASEQF#KEY     SB3400           rotate
+     C           C#ENTR    CASEQF#KEY     SB3100           drop
+      *
+     C                     ENDCS
+      *
+     C                     GOTO LBINV                      inv again
+      *
+     C                     EXSR SB9999                     exit
+      *
+      *======================================================
+      /TITLE --- SB1200 --- GET TIME
+      *------------------------------------------------------
+     C           SB1200    BEGSR
+      *------------------------------------------------------
+     C                     TIME           #TIME  140
+     C                     MOVEL#TIME     #TALL     P
+     C                     MOVE #TTHH     #OTHH
+     C                     MOVE #TTMM     #OTMM
+     C                     MOVE #TTSS     #OTSS
+     C                     MOVE #TDDD     #ODDD
+     C                     MOVE #TDMM     #ODMM
+     C                     MOVE #TDYY     #ODYY
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB1201 --- PUT TIME
+      *------------------------------------------------------
+     C           SB1201    BEGSR
+      *------------------------------------------------------
+     C                     MOVEL#OALL     $$OALL
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB1100 --- RESET
+      *------------------------------------------------------
+     C           SB1100    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB1300                     get record
+      *
+1    C           #SCRR     IFLT #SCR
+     C                     EXSR SB1301                     put record
+1    C                     ENDIF
+      *
+     C                     GOTO LBRST
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB1001 --- INIT
+      *------------------------------------------------------
+     C           SB1001    BEGSR
+      *------------------------------------------------------
+     C                     SETON                     20    create
+     C                     SETON                       22  redraw
+     C                     SETOF                     21    del.line
+     C                     SETOF                       23  break
+      *
+     C                     Z-ADD0         #SCR    50       curr.score
+     C                     Z-ADD0         #SCRR   50       score rec
+     C                     Z-ADD0         #USED   50       used flag
+     C                     MOVEL*BLANKS   #NAMR  20        name rec
+     C                     MOVEL*BLANKS   #TIMR  21        time rec
+      *
+     C                     Z-ADD0         #I      20       :x0
+     C                     Z-ADD0         #J      20       :x1
+     C                     Z-ADD0         #K      20       :y0
+     C                     Z-ADD0         #L      20       :y1
+      *
+     C                     Z-ADD0         #M      20       :row top
+     C                     Z-ADD0         #N      20       :row bottom
+     C                     Z-ADD0         #O      20       :row current
+      *
+     C                     MOVE *BLANKS   #A1
+     C                     MOVE *BLANKS   #A2
+     C                     MOVE *BLANKS   #AO
+     C                     MOVE *BLANKS   #B1
+     C                     MOVE *BLANKS   #BO
+     C                     MOVE *BLANKS   #C1
+     C                     MOVE *BLANKS   #CO
+     C                     MOVE *BLANKS   #V1
+     C                     MOVE *BLANKS   #VO
+     C                     MOVE *BLANKS   #T1
+     C                     MOVE *BLANKS   #TO
+      *
+     C                     EXSR SB1300                     get record
+      *
+     C                     MOVEA#O2       *IN,59           ovrdta all
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB2100 --- REDRAW
+      *------------------------------------------------------
+     C           SB2100    BEGSR
+      *------------------------------------------------------
+     C                     MOVEA#AO,1     $$O01
+     C                     MOVEA#AO,2     $$O02
+     C                     MOVEA#AO,3     $$O03
+     C                     MOVEA#AO,4     $$O04
+     C                     MOVEA#AO,5     $$O05
+     C                     MOVEA#AO,6     $$O06
+     C                     MOVEA#AO,7     $$O07
+     C                     MOVEA#AO,8     $$O08
+     C                     MOVEA#AO,9     $$O09
+     C                     MOVEA#AO,10    $$O10
+     C                     MOVEA#AO,11    $$O11
+     C                     MOVEA#AO,12    $$O12
+     C                     MOVEA#AO,13    $$O13
+     C                     MOVEA#AO,14    $$O14
+     C                     MOVEA#AO,15    $$O15
+     C                     MOVEA#AO,16    $$O16
+     C                     MOVEA#AO,17    $$O17
+     C                     MOVEA#AO,18    $$O18
+     C                     Z-ADD#SCR      $$OSCR
+     C                     Z-ADD#SCRR     $$RECR
+     C                     MOVEL#NAMR     $$NAME    P
+     C                     MOVEL#TIMR     $$FROM    P
+     C                     SETOF                       22  redraw
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB1300 --- GET RECORD
+      *------------------------------------------------------
+     C           SB1300    BEGSR
+      *------------------------------------------------------
+     C           1         SETLLV2R
+     C                     READ V2R                 N    01
+      *
+1    C           *IN01     IFEQ *OFF
+     C                     Z-ADDV2SCR     #SCRR
+     C                     Z-ADDV2USED    #USED
+     C                     MOVELV2NAME    #NAMR     P
+     C                     MOVELV2DATE    #TIMR     P
+1E   C                     ELSE
+     C                     Z-ADD0         #SCRR
+     C                     Z-ADD0         #USED
+     C                     MOVE *BLANKS   #NAMR
+     C                     MOVE *BLANKS   #TIMR
+1    C                     ENDIF
+      *
+     C                     MOVE *ON       *IN59            ovrdta recor
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB1301 --- PUT RECORD
+      *------------------------------------------------------
+     C           SB1301    BEGSR
+      *------------------------------------------------------
+     C                     EXFMTVREC                       input name
+      *
+     C           1         SETLLV2R
+     C                     READ V2R                 N    01
+      *
+0    C           *IN01     IFEQ *OFF                       |EOF
+ 1   C           #USED     IFEQ V2USED                     |locked
+ ³   C           #SCR      ANDGTV2SCR                      still record
+     C           1         SETLLV2R
+     C                     READ V2R                      01
+     C                     ADD  1         V2USED
+     C                     UPDATV2R
+     C           1         SETLLV2R
+     C                     READ V2R                      01
+      *
+     C                     Z-ADD#SCR      V2SCR
+     C                     MOVEL$$INAM    V2NAME
+     C                     EXSR SB1200                     get time
+     C                     MOVEL#OALL     V2DATE
+     C                     UPDATV2R
+      *
+     C                     UNLCKV2PF
+      *
+ 1E  C                     ELSE
+     C                     EXFMTVLAT                       sorry, late
+ 1   C                     ENDIF
+0E   C                     ELSE                            empty file
+     C                     Z-ADD#SCR      V2SCR
+     C                     MOVEL$$INAM    V2NAME
+     C                     EXSR SB1200                     get time
+     C                     MOVEL#OALL     V2DATE
+     C                     Z-ADD0         V2USED
+     C                     WRITEV2R
+      *
+     C                     UNLCKV2PF
+      *
+0    C                     ENDIF
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB2000 --- DEL.ROWS
+      *------------------------------------------------------
+     C           SB2000    BEGSR
+      *------------------------------------------------------
+      * #Z - LOCAL VARIABLE (ROWS TO DELETE)
+      *------------------------------------------------------
+     C           *LIKE     DEFN #D        #Z
+      *
+     C           #N        SUB  #M        #Z
+     C                     ADD  1         #Z
+     C                     Z-ADD#N        #O
+      *
+1----C           1         DO   #Z
+     C                     EXSR SB2001                     del.row
+ 2   C           *IN23     IFEQ *ON                        |deleted
+     C                     SUB  1         #O
+ 2   C                     ENDIF
+1----C                     ENDDO
+      *
+3----C           1         DO   #N        #Z
+     C           60        ADD  #Z        #D
+     C                     MOVE *ON       *IN,#D           ovrdta row D
+3----C                     ENDDO
+      *
+     C                     SETON                     20    create
+     C                     SETON                       22  redraw
+     C                     SETOF                     21    del.row
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB2001 --- DEL.ROW
+      *------------------------------------------------------
+     C           SB2001    BEGSR
+      *------------------------------------------------------
+      * #X,#Y,#W,#V - LOCAL VARIABLES
+      *------------------------------------------------------
+     C           *LIKE     DEFN #D        #Y
+     C           *LIKE     DEFN #D        #X
+     C           *LIKE     DEFN #D        #W
+     C           *LIKE     DEFN #D        #V
+      *
+     C                     SETOF                     23    |break
+      *
+     C                     MOVEA#AO,#O    #A1
+     C                     SETOF                     30    |found
+     C           ' '       LOKUP#A1                      30
+      *
+1    C           *IN30     IFEQ *ON                        ' ' found
+     C                     SETON                     23    break
+1E   C                     ELSE                            ' '|found
+     C           #O        SUB  1         #Y               how many
+ 2---C           1         DO   #Y        #X
+     C           #O        SUB  #X        #V               :from
+     C           #V        ADD  1         #W               :to
+     C                     MOVEA#AO,#V    #A1
+     C                     MOVEA#A1       #AO,#W
+ 2---C                     ENDDO
+     C                     MOVEA*BLANKS   #A1
+     C                     MOVEA#A1       #AO,1
+     C                     ADD  1         #SCR             curr.score
+     C                     MOVE *ON       *IN60            ovrdta score
+1    C                     ENDIF
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB2200 --- SET POS
+      *------------------------------------------------------
+     C           SB2200    BEGSR
+      *------------------------------------------------------
+      * #A - ROW   1..18
+      * #B - POS   1..15
+      * #C - POS   1..30
+      * #CC - CHAR 'OO'³'  '
+      *------------------------------------------------------
+     C           *LIKE     DEFN #D        #A
+     C           *LIKE     DEFN #D        #B
+     C           *LIKE     DEFN #D        #C
+     C           *NAMVAR   DEFN           #CC     2
+      *
+     C                     MOVEA#AO,#A    #A1
+     C           #B        MULT 2         #C
+     C                     SUB  1         #C
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB2201 --- GET CHAR
+      *------------------------------------------------------
+     C           SB2201    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB2200                     Set pos
+     C                     MOVEA#A1,#C    #CC
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB2202 --- PUT CHAR
+      *------------------------------------------------------
+     C           SB2202    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB2200                     Set pos
+     C                     MOVEA#CC       #A1,#C
+     C                     MOVEA#A1       #AO,#A
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB3100 --- DROP
+      *------------------------------------------------------
+     C           SB3100    BEGSR
+      *------------------------------------------------------
+      * #F - START ROW FROM WICH ITEM WAS DROPED
+      * #G - CURR. ROW TROUGH WICH ITEM WAS FLOWN
+      *------------------------------------------------------
+     C           *LIKE     DEFN #D        #F
+     C           *LIKE     DEFN #D        #G
+      *
+     C                     Z-ADD#L        #F               start row
+      *
+     C                     SETOF                     23    |break
+1----C           *IN23     DOUEQ*ON
+     C                     EXSR SB3101                     down
+1----C                     ENDDO
+      *
+2----C           #F        DO   #K        #G               all flown ro
+     C           60        ADD  #G        #D
+     C                     MOVE *ON       *IN,#D           ovrdta row D
+2----C                     ENDDO
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB3101 --- DOWN
+      *------------------------------------------------------
+     C           SB3101    BEGSR
+      *------------------------------------------------------
+     C                     SETOF                     23    |break
+      *
+0    C           #K        IFGE C#R2                       last row
+     C                     SETON                     23    break
+0E   C                     ELSE
+     C           1         ADD  #L        #S               ++row
+     C                     Z-ADD#I        #T               col
+     C                     Z-ADD0         #U               no rotate
+     C                     EXSR SB3102                     curr test
+0    C                     ENDIF
+      *
+1    C           *IN23     IFEQ *OFF                       Ok|
+     C                     EXSR SB3103                     curr curr
+     C                     SETON                       22  redraw
+     C                     ADD  1         #L
+     C                     ADD  1         #K
+1E   C                     ELSE
+     C                     Z-ADD#L        #M
+     C                     Z-ADD#K        #N
+     C                     EXSR SB2000                     del.rows
+1    C                     ENDIF
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB3200 --- LEFT-MAX
+      *------------------------------------------------------
+     C           SB3200    BEGSR
+      *------------------------------------------------------
+     C                     SETOF                     23    |break
+1----C           *IN23     DOUEQ*ON
+     C                     EXSR SB3201                     left
+1----C                     ENDDO
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB3201 --- LEFT
+      *------------------------------------------------------
+     C           SB3201    BEGSR
+      *------------------------------------------------------
+     C                     SETOF                     23    |break
+      *
+0    C           #I        IFLE C#1                        first row
+     C                     SETON                     23    break
+0E   C                     ELSE
+     C                     Z-ADD#L        #S               row
+     C           #I        SUB  1         #T               --col
+     C                     Z-ADD0         #U               no rotate
+     C                     EXSR SB3102                     curr test
+0    C                     ENDIF
+      *
+1    C           *IN23     IFEQ *OFF                       Ok|
+     C                     EXSR SB3103                     curr curr
+     C                     SUB  1         #I
+     C                     SUB  1         #J
+     C                     SETON                       22  redraw
+1    C                     ENDIF
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB3300 --- RIGHT-MAX
+      *------------------------------------------------------
+     C           SB3300    BEGSR
+      *------------------------------------------------------
+     C                     SETOF                     23    |break
+1----C           *IN23     DOUEQ*ON
+     C                     EXSR SB3301                     right
+1----C                     ENDDO
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB3301 --- RIGHT
+      *------------------------------------------------------
+     C           SB3301    BEGSR
+      *------------------------------------------------------
+     C                     SETOF                     23    |break
+      *
+0    C           #J        IFGE C#3                        last row
+     C                     SETON                     23    break
+0E   C                     ELSE
+     C                     Z-ADD#L        #S               row
+     C           #I        ADD  1         #T               ++col
+     C                     Z-ADD0         #U               no rotate
+     C                     EXSR SB3102                     curr test
+0    C                     ENDIF
+      *
+1    C           *IN23     IFEQ *OFF                       Ok|
+     C                     EXSR SB3103                     curr curr
+     C                     ADD  1         #I
+     C                     ADD  1         #J
+     C                     SETON                       22  redraw
+1    C                     ENDIF
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB3400 --- ROTATE
+      *------------------------------------------------------
+     C           SB3400    BEGSR
+      *------------------------------------------------------
+      * #XR,#YR - LOCAL VARIABLE
+      *------------------------------------------------------
+     C           *LIKE     DEFN #D        #XR
+     C           *LIKE     DEFN #D        #YR
+      *
+     C                     SETOF                     23    |break
+      *
+     C           #J        SUB  #I        #XR
+     C                     ADD  #L        #XR
+1    C           #XR       IFGT C#R2
+     C                     SETON                     23    break
+1    C                     ENDIF
+      *
+     C           #K        SUB  #L        #XR
+     C                     ADD  #I        #XR
+2    C           #XR       IFGT C#3
+     C                     SETON                     23    break
+2    C                     ENDIF
+      *
+0    C           *IN23     IFEQ *OFF
+     C                     Z-ADD#L        #S               row
+     C                     Z-ADD#I        #T               col
+     C                     Z-ADD1         #U               rotate
+     C                     EXSR SB3102                     curr test
+0    C                     ENDIF
+      *
+3    C           *IN23     IFEQ *OFF                       Ok|
+     C                     EXSR SB3103                     curr curr
+     C                     EXSR SB5500                     frotated
+      *
+     C           #J        SUB  #I        #XR
+     C           #K        SUB  #L        #YR
+     C           #I        ADD  #YR       #J
+     C           #L        ADD  #XR       #K
+      *
+     C                     SETON                       22  redraw
+3    C                     ENDIF
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB3102 --- CURR TEST
+      *------------------------------------------------------
+     C           SB3102    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB4300                     rput all
+     C                     EXSR SB5400                     fxor
+0    C           #U        IFEQ 1
+     C                     EXSR SB5100                     frotate
+     C                     MOVEA#VO       #TO              rot->tmp
+0E   C                     ELSE
+     C                     MOVEA#CO       #TO              img->tmp
+0    C                     ENDIF
+     C                     EXSR SB5900                     ftest
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB3103 --- CURR CURR
+      *------------------------------------------------------
+     C           SB3103    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB5099                     fhide item
+     C                     EXSR SB4300                     rput all
+     C                     EXSR SB5300                     fadd
+     C                     EXSR SB4301                     rrestore all
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB3600 --- CREATE
+      *------------------------------------------------------
+     C           SB3600    BEGSR
+      *------------------------------------------------------
+      * #RR - RANDOM
+      *------------------------------------------------------
+      * max size: 4x4 (C#10xC#10)
+      *------------------------------------------------------
+     C           *NAMVAR   DEFN           #RR     20
+      *
+     C                     EXSR SB1200                     get time
+     C                     MOVE #TTSS     #RR       P
+     C           #RR       DIV  15        #RR
+     C                     MVR            #RR              0...14
+     C                     ADD  1         #RR              1...15
+      *
+     C                     MOVEA#FO,#RR   #F1
+     C                     MOVEA#F1       #TO
+      *
+     C                     Z-ADDC#SR      #L
+     C                     MOVE #F1,17    #K        P
+     C                     ADD  #L        #K
+     C                     SUB  1         #K
+      *
+     C                     Z-ADDC#SC      #I
+     C                     MOVE #F1,18    #J        P
+     C                     ADD  #I        #J
+     C                     SUB  1         #J
+      *
+     C                     Z-ADDC#SR      #S
+     C                     Z-ADDC#SC      #T
+     C                     Z-ADD0         #U
+      *
+     C                     SETOF                       23  |break
+     C                     EXSR SB3601                     create test
+      *
+9    C           *IN23     IFEQ *ON                        cannot crt
+     C                     EXSR SB1100                     reset
+9E   C                     ELSE
+     C                     EXSR SB3602                     create curr
+9    C                     ENDIF
+      *
+     C                     SETON                       22  redraw
+     C                     SETOF                       20  create
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB3601 --- CREATE TEST
+      *------------------------------------------------------
+     C           SB3601    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB4300                     rput all
+     C                     EXSR SB5900                     ftest
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB3602 --- CREATE CURR
+      *------------------------------------------------------
+     C           SB3602    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB4300                     rput all
+     C                     EXSR SB5300                     fadd
+     C                     EXSR SB4301                     rrestore all
+     C                     MOVEA#TO       #CO
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB4300 --- RPUT ALL
+      *------------------------------------------------------
+     C           SB4300    BEGSR
+      *------------------------------------------------------
+      * #XP,#YP - LOCAL VARIABLES
+      *------------------------------------------------------
+      * #S - START ROW (  0³1  + #L)
+      * #T - START POS (-1³0³1 + #I)
+      * #U - ROTATE FLAG ( 0³1 )
+      *------------------------------------------------------
+     C           *LIKE     DEFN #D        #T
+     C           *LIKE     DEFN #D        #S
+     C           *LIKE     DEFN #D        #U
+     C           *LIKE     DEFN #D        #XP
+     C           *LIKE     DEFN #D        #YP
+      *
+     C                     MOVEA*BLANKS   #BO
+     C                     MOVEA*BLANKS   #B1
+      *
+A----C           0         DO   C#9       #YP
+     C           1         ADD  #YP       #Q               dst row
+     C           #S        ADD  #YP       #A               src row
+  C  C           #A        IFGT C#R2
+AX---C                     ITER
+  C  C                     ENDIF
+ B---C           0         DO   C#9       #XP
+     C           #T        ADD  #XP       #B               src pos
+  D  C           #B        IFGT C#3
+ BX--C                     ITER
+  D  C                     ENDIF
+     C                     EXSR SB2201                     get char
+     C                     MOVE #CC       #CR
+     C           1         ADD  #XP       #E               dst pos
+     C                     EXSR SB4202                     rput char
+ B---C                     ENDDO
+A----C                     ENDDO
+      *
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB4301 --- RRESTORE ALL
+      *------------------------------------------------------
+     C           SB4301    BEGSR
+      *------------------------------------------------------
+      * #XP,#YP - LOCAL VARIABLES (SHARED WITH RPUT ALL)
+      *------------------------------------------------------
+A----C           0         DO   C#9       #YP
+     C           1         ADD  #YP       #Q               src row
+ B---C           0         DO   C#9       #XP
+     C           1         ADD  #XP       #E               src pos
+     C                     EXSR SB4201                     rget char
+  1  C           C#CHR     IFEQ #CR
+     C                     MOVE C#DCH     #CC
+  1E C                     ELSE
+     C                     MOVE '  '      #CC
+  1  C                     ENDIF
+     C           #S        ADD  #YP       #A               dst row
+     C           #T        ADD  #XP       #B               dst pos
+  2  C           #A        IFLE C#R2
+  ³  C           #B        ANDLEC#3
+     C                     EXSR SB2202                     put char
+  2  C                     ENDIF
+ B---C                     ENDDO
+A----C                     ENDDO
+      *
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB5300 --- FADD ITEM
+      *------------------------------------------------------
+     C           SB5300    BEGSR
+      *------------------------------------------------------
+      * #XP,#YP - LOCAL VARIABLES (SHARED WITH RPUT ALL)
+      *------------------------------------------------------
+1----C           1         DO   C#10      #XP              rows
+     C                     Z-ADD#XP       #Q               dst row
+     C                     MOVEA#TO,#Q    #T1              src row
+ 2---C           1         DO   C#10      #YP              cols
+     C                     Z-ADD#YP       #E               dst pos
+     C                     MOVE #T1,#E    #CR              src pos red
+      *
+  3  C           #CR       IFEQ C#CHR
+     C                     EXSR SB4202                     rput char
+  3  C                     ENDIF
+      *
+ 2---C                     ENDDO
+1----C                     ENDDO
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB5400 --- FXOR ITEM
+      *------------------------------------------------------
+     C           SB5400    BEGSR
+      *------------------------------------------------------
+      * #XP,#YP - LOCAL VARIABLES (SHARED WITH RPUT ALL)
+      * #ZP - LOCAL VARIABLE
+      *------------------------------------------------------
+     C           *LIKE     DEFN #D        #ZP
+      *
+1----C           1         DO   C#10      #XP              rows
+ 2---C           1         DO   C#10      #YP              cols
+      *
+     C           #S        SUB  #L        #ZP              delta row
+     C           #XP       ADD  #ZP       #Q               src row
+     C           #T        SUB  #I        #ZP              delta pos
+     C           #YP       ADD  #ZP       #E               src pos
+      *
+  3  C           #Q        IFLE C#10
+  ³  C           #Q        ANDGE1
+  ³  C           #E        ANDLEC#10
+  ³  C           #E        ANDGE1
+     C                     EXSR SB5201                     fget char
+  3E C                     ELSE
+     C                     MOVE ' '       #CF
+  3  C                     ENDIF
+      *
+  4  C           C#CHR     IFEQ #CF
+     C                     MOVE ' '       #CR
+     C                     Z-ADD#XP       #Q               dst row
+     C                     Z-ADD#YP       #E               dst row
+     C                     EXSR SB4202                     rput char
+  4  C                     ENDIF
+      *
+ 2---C                     ENDDO
+1----C                     ENDDO
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB5100 --- FROTATE ITEM
+      *------------------------------------------------------
+     C           SB5100    BEGSR
+      *------------------------------------------------------
+     C                     MOVEA*BLANKS   #VO
+     C                     MOVEA*BLANKS   #V1
+      *
+1----C           1         DO   C#10      #Q               rows
+ 2---C           1         DO   C#10      #E               cols
+      *
+     C                     EXSR SB5201                     fget char
+  3  C           #CF       IFEQ C#CHR                      range Ok|
+     C                     MOVE #CF       #CV
+     C                     EXSR SB5802                     vput char
+  3  C                     ENDIF
+      *
+ 2---C                     ENDDO
+1----C                     ENDDO
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB5500 --- FROTATED ITEM
+      *------------------------------------------------------
+     C           SB5500    BEGSR
+      *------------------------------------------------------
+     C                     MOVEA#VO       #CO
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB5900 --- FTEST ITEM
+      *------------------------------------------------------
+     C           SB5900    BEGSR
+      *------------------------------------------------------
+      * #XP,#YP - LOCAL VARIABLES (SHARED WITH RPUT ALL)
+      *------------------------------------------------------
+1----C           1         DO   C#10      #XP              rows
+     C                     Z-ADD#XP       #Q               dst row
+     C                     MOVEA#TO,#Q    #T1              src row
+ 2---C           1         DO   C#10      #YP              cols
+     C                     Z-ADD#YP       #E               dst pos
+      *
+     C                     MOVE #T1,#E    #CV              src pos red
+     C                     EXSR SB4201                     rget char
+  3  C           #CR       IFEQ C#CHR
+  ³  C           #CV       ANDEQC#CHR
+     C                     SETON                     23    break
+  3  C                     ENDIF
+      *
+ 2---C                     ENDDO
+1----C                     ENDDO
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB5099 --- FHIDE ITEM
+      *------------------------------------------------------
+     C           SB5099    BEGSR
+      *------------------------------------------------------
+      * #XP,#YP - LOCAL VARIABLES (SHARED WITH RPUT ALL)
+      *------------------------------------------------------
+1----C           0         DO   C#9       #XP              rows
+     C           1         ADD  #XP       #Q               src row
+     C           #L        ADD  #XP       #A               dst row
+ 2---C           0         DO   C#9       #YP              cols
+     C           1         ADD  #YP       #E               src pos
+     C           #I        ADD  #YP       #B               dst pos
+      *
+     C                     EXSR SB5201                     fget char
+  3  C           #CF       IFEQ C#CHR                      range Ok|
+     C                     MOVE '  '      #CC
+     C                     EXSR SB2202                     put char
+  3  C                     ENDIF
+      *
+ 2---C                     ENDDO
+1----C                     ENDDO
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB4200 --- RSET POS
+      *------------------------------------------------------
+     C           SB4200    BEGSR
+      *------------------------------------------------------
+      * #Q - ROW   1..4
+      * #E - POS   1..4
+      * #CR - CHAR 'O'³' '
+      *------------------------------------------------------
+     C           *LIKE     DEFN #D        #Q
+     C           *LIKE     DEFN #D        #E
+     C           *NAMVAR   DEFN           #CR     1
+      *
+     C                     MOVEA#BO,#Q    #B1
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB4201 --- RGET CHAR
+      *------------------------------------------------------
+     C           SB4201    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB4200                     rset pos
+     C                     MOVE #B1,#E    #CR
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB4202 --- RPUT CHAR
+      *------------------------------------------------------
+     C           SB4202    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB4200                     rset pos
+     C                     MOVE #CR       #B1,#E
+     C                     MOVEA#B1       #BO,#Q
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB5200 --- FSET POS
+      *------------------------------------------------------
+     C           SB5200    BEGSR
+      *------------------------------------------------------
+      * #Q - ROW   1..4
+      * #E - POS   1..4
+      * #CF - CHAR 'O'³' '
+      *------------------------------------------------------
+     C           *NAMVAR   DEFN           #CF     1
+      *
+     C                     MOVEA#CO,#Q    #C1
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB5201 --- FGET CHAR
+      *------------------------------------------------------
+     C           SB5201    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB5200                     fset pos
+     C                     MOVE #C1,#E    #CF
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB5202 --- FPUT CHAR
+      *------------------------------------------------------
+     C           SB5202    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB5200                     fset pos
+     C                     MOVE #CF       #C1,#E
+     C                     MOVEA#C1       #CO,#Q
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB5800 --- VSET POS
+      *------------------------------------------------------
+     C           SB5800    BEGSR
+      *------------------------------------------------------
+      * #Q - ROW   1..4  --> ??-POS  (USED #P)
+      * #E - POS   1..4  --> ROW
+      * #CV - CHAR 'O'³' '
+      *------------------------------------------------------
+     C           *NAMVAR   DEFN           #CV     1
+     C           *LIKE     DEFN #Q        #P
+      *
+     C                     MOVEA#VO,#E    #V1
+     C           #K        SUB  #L        #P
+     C                     ADD  2         #P
+     C           #P        SUB  #Q        #P
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB5801 --- VGET CHAR
+      *------------------------------------------------------
+     C           SB5801    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB5800                     vset pos
+     C                     MOVE #V1,#P    #CV
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB5802 --- VPUT CHAR
+      *------------------------------------------------------
+     C           SB5802    BEGSR
+      *------------------------------------------------------
+     C                     EXSR SB5800                     vset pos
+     C                     MOVE #CV       #V1,#P
+     C                     MOVEA#V1       #VO,#E
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- SB9999 --- EXIT PROGRAM
+      *------------------------------------------------------
+     C           SB9999    BEGSR
+      *------------------------------------------------------
+     C                     EXFMTVBYE                       good bye
+     C                     MOVE *ON       *INLR
+     C                     RETRN
+      *------------------------------------------------------
+     C                     ENDSR
+      *
+      *
+      *
+      *======================================================
+      /TITLE --- COMMENTS
+      *------------------------------------------------------
+      *  Object - a piece of 'O'-blocks
+      *     Fields:
+      *             #L - first row
+      *             #K - last  row
+      *             #I - first pos.
+      *             #J - last  pos.
+      *     Methods:
+      *              SB3100 - Drop           Enter
+      *              SB3101 - Down             Auto
+      *              SB3200 - Left Max       F5
+      *              SB3201 - Left           F6
+      *              SB3300 - Right Max      F8
+      *              SB3301 - Right          F7
+      *              SB3400 - Rotate         F9
+      *              SB3102 - Curr test        Service
+      *              SB3103 - Curr curr        Service
+      *              SB3500 - Stop             Auto
+      *              SB3600 - Create           Auto
+      *              SB3601 - Create test      Service
+      *              SB3602 - Create curr      Service
+      *------------------------------------------------------
+      *  Object - a glass
+      *     Fields:
+      *              #M    - start row to del.
+      *              #N    - end   row to del.
+      *              #O    - current row to del.
+      *              #SCR  - current score
+      *              #SCRR - record score
+      *              #NAMR -   -"-  name of owner
+      *              #TIMR -   -"-  time from
+      *     Methods:
+      *              SB2000 - Delete rows      Auto
+      *              SB2001 - Delete row       Service
+      *              SB2100 - Redraw           Auto
+      *              SB2200 - Set pos.         Service (#A #B)
+      *              SB2201 - Get char         Service (#A #B #CC)
+      *              SB2202 - Put char         Service (#A #B #CC)
+      *              SB1001 - Init           F12, Auto
+      *              SB1100 - Reset          F12, Auto
+      *              SB1200 - Get time         Auto
+      *              SB1201 - Put time         Auto
+      *              SB1300 - Get record       Auto
+      *              SB1301 - Put record       Auto
+      *------------------------------------------------------
+      *  System functions:
+      *------------------------------------------------------
+      *  Object - a work glass
+      *     Methods:
+      *              SB4200 - RSet pos.        Service (#Q #E)
+      *              SB4201 - RGet char        Service (#Q #E #CR)
+      *              SB4202 - RPut char        Service (#Q #E #CR)
+      *              SB4300 - RPut all         Service (#S #T)
+      *              SB4301 - RRestore all     Service (#S #T)
+      *------------------------------------------------------
+      *  Object - a image array
+      *     Methods:
+      *              SB5200 - FSet pos.        Service (#Q #E)
+      *              SB5201 - FGet char        Service (#Q #E #CF)
+      *              SB5202 - FPut char        Service (#Q #E #CF)
+      *              SB5800 - VSet pos.        Service (#E 11-#Q)
+      *              SB5801 - VGet char        Service (#E 11-#Q #CV)
+      *              SB5802 - VPut char        Service (#E 11-#Q #CV)
+      *              SB5100 - FRotate          Service
+      *              SB5300 - FAdd             Service
+      *              SB5400 - FXor             Service
+      *              SB5500 - FRotated         Service
+      *              SB5900 - FTest            Service
+      *              SB5099 - FHide            Service
+      *------------------------------------------------------
+      *              SB9999 - Exit           F3
+      *------------------------------------------------------
+      *  Indicators:
+      *       20 - New Item
+      *       22 - Redraw
+      *       21 - Delete line
+      *       23 - Break
+      *       30 - Find in array
+      *       01 - File operations
+      *       50,51,52,53 - Workstn operations
+      *------------------------------------------------------
+** #FO - items to create
+O               11
+OO              12
+OOO             13
+OOOO            14
+OO  OO          22
+OOOOO           24
+OOOO   O        24
+OO   OO         23
+ OO OO          23
+OOO  O          23
+OOO O O         23
+ O  OOO  O      33
+O   OOO   O     33
+  O OOO O       33
+   O  OO OO OO  44
+** #Z2- 20 zeros to *IN array
+00000000000000000000
+** #O2- 20 ones  to *IN array
+11111111111111111111
+** #O6- 6 ones  to *IN array (left³right³rotate³create³down)
+111111

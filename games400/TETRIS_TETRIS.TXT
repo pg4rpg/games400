@@ -1,0 +1,22 @@
+Name:		Tetris/400
+
+Author:         Victor A.Voilevitch (victorav15@usa.net)
+
+Objects:        V2PF           Physical file
+		V2DF           Display file
+                TETRISR        RPG/400 Program
+
+To Create:      Compile the physical file V2PF first, then the display file V2DF
+		and then RPG/400 program TETRISR.
+
+Object:	        The object of the Tetris/400 game is to neatly stack the shapes
+		as they fall into the well.  Using the Function keys you can
+		move or reposition the shape so that it fits in the well without
+		gaps.
+
+To Start:	CALL TETRISR
+
+Play:		Use function keys F5-F9 to manipulate the pieces as they drop into
+		the well.  If an entire horozintal line is filled, the line is removed.
+		The object is to arrange the pieces without gaps so that the well does
+		not fill up with pieces.

@@ -1,0 +1,29 @@
+A                                           UNIQUE
+A               R REC
+A                 FKEY          10A
+A                 FNR1           1S 0
+A                 FST1           1A
+A                 FNAM1         27A
+A                 FPOS1         64A
+A                 FATR1         64A
+A                 FNR2           1S 0
+A                 FST2           1A
+A                 FNAM2         27A
+A                 FPOS2         64A
+A                 FATR2         64A
+A                 FNR3           1S 0
+A                 FST3           1A
+A                 FNAM3         27A
+A                 FPOS3         64A
+A                 FATR3         64A
+A                 FNR4           1S 0
+A                 FST4           1A
+A                 FNAM4         27A
+A                 FPOS4         64A
+A                 FATR4         64A
+A                 FNR5           1S 0
+A                 FST5           1A
+A                 FNAM5         27A
+A                 FPOS5         64A
+A                 FATR5         64A
+A               K FKEY

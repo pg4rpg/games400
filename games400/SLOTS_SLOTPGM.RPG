@@ -1,0 +1,396 @@
+     H*****************************************************************
+     H* Program Name :  SLOTPGM  ( Type - RPG )
+     H* Description  :  To Display The Simulated Slot Machine Allowing
+     H*                 The User To Play And Have Some Fun.
+     H*                 It Also Provides A Credit Meter To Keep Track
+     H*                 Of Wins/Losses Etc.
+     H* Written      :  N.Shankar.
+     H* Dated        :  21 st Oct. 1997.
+     H*****************************************************************
+     F*
+     F* Simulated Slot Machine Display File
+     FSLOTDF  CF  E                    WORKSTN
+     F*
+     E*****************************************************************
+     E*
+     E* Indicator Values Array
+     E                    AIN         9  1 0
+     E*
+     E* Indicator Values Array
+     E                    XAIN        9  1
+     E*
+     I*****************************************************************
+     I*
+     I* Program Status Data Structure
+     IPGMDS      SDS
+     I                                        1  10 PGMNAM
+     I                                       37  390#PARMS
+     I                                      244 253 WSID
+     I                                      254 263 USERID
+     I                                      264 2690JOBNO
+     I*
+     I* Data Structure To Separate Time & Date
+     I            DS
+     I                                        1  140TIMDAT
+     I                                        1   60STIME
+     I                                        7  140SDATE
+     I*
+     C*****************************************************************
+     C*
+     C           *IN03     DOUEQ'1'                         Do
+     C*                                                     !
+     C*          Initialise The #Bets                       !
+     C                     Z-ADD0         #BET              !
+     C*                                                     !
+     C*          Display The Screen                         !
+     C                     EXFMTREC0                        !
+     C*                                                     !
+     C*          Update The 'Win Meter'                     !
+     C                     Z-ADDCURWIN    LSTWIN            !
+     C                     Z-ADD0         CURWIN            !
+     C*                                                     !
+     C           *IN03     IFEQ '1'                         ! If
+     C                     LEAVE                            ! !
+     C                     ENDIF                            ! Endif
+     C*                                                     !
+     C*          Highlight The Valid Lines Based On The     !
+     C*          Number of Bets (1-3)                       !
+     C                     SELEC                            ! Selec
+     C           #BET      WHEQ 1                           ! !
+     C                     MOVEA'100'     *IN,31            ! !
+     C           #BET      WHEQ 2                           ! !
+     C                     MOVEA'110'     *IN,31            ! !
+     C           #BET      WHEQ 3                           ! !
+     C                     MOVEA'111'     *IN,31            ! !
+     C                     ENDSL                            ! Endsl
+     C*                                                     !
+     C*          Sub The Credit By The #Bets & Save It      !
+     C                     SUB  #BET      CREDIT            !
+     C                     Z-ADD#BET      #LBET             !
+     C*                                                     !
+     C*          Spin The Wheels 10 Times & Display         !
+     C                     DO   10                          ! Do
+     C                     EXSR $SPIN1                      ! !
+     C                     EXSR $SPIN2                      ! !
+     C                     EXSR $SPIN3                      ! !
+     C                     WRITEREC2                        ! !
+     C                     ENDDO                            ! Enddo
+     C*                                                     !
+     C                     DO   10                          ! Do
+     C                     EXSR $SPIN2                      ! !
+     C                     EXSR $SPIN3                      ! !
+     C                     WRITEREC2                        ! !
+     C                     ENDDO                            ! Enddo
+     C*                                                     !
+     C                     DO   10                          ! Do
+     C                     EXSR $SPIN3                      ! !
+     C                     WRITEREC2                        ! !
+     C                     ENDDO                            ! Enddo
+     C*                                                     !
+     C*          Calculate The Amount Of Win (If Any)       !
+     C                     EXSR $WIN                        !
+     C*                                                     !
+     C                     ENDDO                            Enddo
+     C*
+     C*
+     C                     MOVE '1'       *INLR
+     C                     RETRN
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  $SPIN1
+     C* Description     :  To Spin The First Wheel Line
+     C*****************************************************************
+     C*
+     C           $SPIN1    BEGSR
+     C*
+     C                     MULT MF        START1
+     C                     MOVE START1    CSTART  9
+     C                     MOVEACSTART    XAIN
+     C                     MOVE XAIN      AIN
+     C*
+     C                     EXSR $CALC
+     C*
+     C                     MOVE AIN       XAIN
+     C                     MOVEAXAIN      CSTART
+     C                     MOVE CSTART    START1
+     C                     MOVEAXAIN      *IN,41
+     C*
+     C                     Z-ADD41        BEGIND  20        Begin. Ind.
+     C                     EXSR $CHKIN
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  $SPIN2
+     C* Description     :  To Spin The Second Wheel Line
+     C*****************************************************************
+     C*
+     C           $SPIN2    BEGSR
+     C*
+     C                     MULT MF        START2
+     C                     MOVE START2    CSTART
+     C                     MOVEACSTART    XAIN
+     C                     MOVE XAIN      AIN
+     C*
+     C                     EXSR $CALC
+     C*
+     C                     MOVE AIN       XAIN
+     C                     MOVEAXAIN      CSTART
+     C                     MOVE CSTART    START2
+     C                     MOVEAXAIN      *IN,51
+     C*
+     C                     Z-ADD51        BEGIND            Begin. Ind.
+     C                     EXSR $CHKIN
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  $SPIN3
+     C* Description     :  To Spin The Third Wheel Line
+     C*****************************************************************
+     C*
+     C           $SPIN3    BEGSR
+     C*
+     C                     MULT MF        START3
+     C                     MOVE START3    CSTART
+     C                     MOVEACSTART    XAIN
+     C                     MOVE XAIN      AIN
+     C*
+     C                     EXSR $CALC
+     C*
+     C                     MOVE AIN       XAIN
+     C                     MOVEAXAIN      CSTART
+     C                     MOVE CSTART    START3
+     C                     MOVEAXAIN      *IN,61
+     C*
+     C                     Z-ADD61        BEGIND            Begin. Ind.
+     C                     EXSR $CHKIN
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  $CALC
+     C* Description     :  To Calculate The Forthcoming Values
+     C*****************************************************************
+     C*
+     C           $CALC     BEGSR
+     C*
+     C*          Reduce The Digits To Either 0 (If Even)
+     C*          Or 1 (If Odd)
+     C           1         DO   9         I       20        Do
+     C           AIN,I     DOWGT1                           ! Do
+     C                     SUB  2         AIN,I             ! !
+     C                     ENDDO                            ! Enddo
+     C                     ENDDO                            Enddo
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  $CHKIN
+     C* Description     :  To Ensure Integrity Between Bars Displayed
+     C*****************************************************************
+     C*
+     C           $CHKIN    BEGSR
+     C*
+     C*          If the Top & Bottom Bars (Of Same Line)
+     C*          Are Displayed, Then Ensure That The Middle
+     C*          Bar Is Also Displayed
+     C                     DO   3                           Do
+     C*                                                     !
+     C                     Z-ADDBEGIND    P       20        !
+     C           P         ADD  1         C       20        !
+     C           C         ADD  1         N       20        !
+     C*                                                     !
+     C           *IN,P     IFEQ '0'                         ! If
+     C           *IN,C     ANDEQ'1'                         ! !
+     C           *IN,N     ANDEQ'0'                         ! !
+     C                     MOVE '0'       *IN,C             ! !
+     C                     ENDIF                            ! Endif
+     C*                                                     !
+     C                     ADD  3         BEGIND            !
+     C*                                                     !
+     C                     ENDDO                            Enddo
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  $WIN
+     C* Description     :  To Calculate The Amount Of Win For Each Of
+     C*                    The Valid Lines
+     C*****************************************************************
+     C*
+     C           $WIN      BEGSR
+     C*
+     C*
+     C           1         DO   3         I                 Do
+     C*                                                     !
+     C*          Assign Beginning Ind. For Each Row         !
+     C                     SELEC                            ! Selec
+     C           I         WHEQ 1                           ! ! Wheq
+     C                     Z-ADD44        BEGIND            ! !
+     C           I         WHEQ 2                           ! ! Wheq
+     C                     Z-ADD41        BEGIND            ! !
+     C           I         WHEQ 3                           ! ! Wheq
+     C                     Z-ADD47        BEGIND            !
+     C                     ENDSL                            !
+     C*                                                     !
+     C*                                                     !
+     C*          Column-1, Lines 1/2/3                      !
+     C                     Z-ADDBEGIND    C1L1    20        !
+     C           C1L1      ADD  1         C1L2    20        !
+     C           C1L2      ADD  1         C1L3    20        !
+     C*                                                     !
+     C*          Column-2, Lines 1/2/3                      !
+     C           C1L1      ADD  10        C2L1    20        !
+     C           C1L2      ADD  10        C2L2    20        !
+     C           C1L3      ADD  10        C2L3    20        !
+     C*                                                     !
+     C*          Column-3, Lines 1/2/3                      !
+     C           C2L1      ADD  10        C3L1    20        !
+     C           C2L2      ADD  10        C3L2    20        !
+     C           C2L3      ADD  10        C3L3    20        !
+     C*                                                     !
+     C*          How Many Bars In Each Line Are Lit ??      !
+     C                     Z-ADD0         COUNT1  10        !
+     C                     Z-ADD0         COUNT2  10        !
+     C                     Z-ADD0         COUNT3  10        !
+     C                     Z-ADD0         CENTER  10        ! Center Line
+     C*          Column-1, Lines 1/2/3                      !
+     C           *IN,C1L1  IFEQ '0'                         ! If
+     C                     ADD  1         COUNT1            ! !
+     C                     ENDIF                            ! Endif
+     C           *IN,C1L2  IFEQ '0'                         ! If
+     C                     ADD  1         COUNT1            ! !
+     C                     ADD  1         CENTER            ! !
+     C                     ENDIF                            ! Endif
+     C           *IN,C1L3  IFEQ '0'                         ! If
+     C                     ADD  1         COUNT1            ! !
+     C                     ENDIF                            ! Endif
+     C*                                                     !
+     C*          Column-2, Lines 1/2/3                      !
+     C           *IN,C2L1  IFEQ '0'                         ! If
+     C                     ADD  1         COUNT2            ! !
+     C                     ENDIF                            ! Endif
+     C           *IN,C2L2  IFEQ '0'                         ! If
+     C                     ADD  1         COUNT2            ! !
+     C                     ADD  1         CENTER            ! !
+     C                     ENDIF                            ! Endif
+     C           *IN,C2L3  IFEQ '0'                         ! If
+     C                     ADD  1         COUNT2            ! !
+     C                     ENDIF                            ! Endif
+     C*                                                     !
+     C*          Column-3, Lines 1/2/3                      !
+     C           *IN,C3L1  IFEQ '0'                         ! If
+     C                     ADD  1         COUNT3            ! !
+     C                     ENDIF                            ! Endif
+     C           *IN,C3L2  IFEQ '0'                         ! If
+     C                     ADD  1         COUNT3            ! !
+     C                     ADD  1         CENTER            ! !
+     C                     ENDIF                            ! Endif
+     C           *IN,C3L3  IFEQ '0'                         ! If
+     C                     ADD  1         COUNT3            ! !
+     C                     ENDIF                            ! Endif
+     C*                                                     !
+     C*                                                     !
+     C*          Assign Amount Won Based On #Bars Lit       !
+     C*                                                     !
+     C                     SELEC                            ! Selec
+     C*          JackPot Triple Bar/Triple Bar/Triple Bar   ! !
+     C           COUNT1    WHEQ 3                           ! ! Wheq
+     C           COUNT2    ANDEQ3                           ! !
+     C           COUNT3    ANDEQ3                           ! !
+     C                     ADD  80        CURWIN            ! !
+     C*          Double Bar/Double Bar/Double Bar           ! !
+     C           COUNT1    WHEQ 2                           ! ! Wheq
+     C           COUNT2    ANDEQ2                           ! !
+     C           COUNT3    ANDEQ2                           ! !
+     C                     ADD  40        CURWIN            ! !
+     C*          Single Bar/Single Bar/Single Bar           ! !
+     C           COUNT1    WHEQ 1                           ! ! Wheq
+     C           COUNT2    ANDEQ1                           ! !
+     C           COUNT3    ANDEQ1                           ! !
+     C           CENTER    ANDEQ3                           ! !
+     C                     ADD  10        CURWIN            ! !
+     C*          Mixed Bar/Mixed Bar/Mixed Bar              ! !
+     C           COUNT1    WHGT 0                           ! ! Wheq
+     C           COUNT2    ANDGT0                           ! !
+     C           COUNT3    ANDGT0                           ! !
+     C           CENTER    ANDEQ3                           ! !
+     C                     ADD  5         CURWIN            ! !
+     C                     ENDSL                            ! Endsl
+     C*                                                     !
+     C*          Calculate The Win Amount, Only For The     !
+     C*          #Lines Played                              !
+     C           I         IFGE #BET                        ! If
+     C                     LEAVE                            ! !
+     C                     ENDIF                            ! Endif
+     C*                                                     !
+     C                     ENDDO                            Enddo
+     C*
+     C*
+     C*          Add The Current Wins To The Credit Meter
+     C                     ADD  CURWIN    CREDIT
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C* Subroutine Name :  *INZSR
+     C* Description     :  To Perform First Time Initialization
+     C*****************************************************************
+     C*
+     C           *INZSR    BEGSR
+     C*
+     C*          Define Program Entry Parameters
+     C           *ENTRY    PLIST
+     C                     PARM           PARM1   90
+     C                     PARM           PARM2   90
+     C                     PARM           PARM3   90
+     C*
+     C*          Initialise Requisite Variables
+     C           #PARMS    IFEQ 3                           If
+     C                     Z-ADDPARM1     START1  90        !
+     C                     Z-ADDPARM2     START2  90        !
+     C                     Z-ADDPARM3     START3  90        !
+     C                     ELSE                             Else
+     C*          Provide Default Values For START1,2,3      !
+     C                     Z-ADD123456789 START1            !
+     C                     Z-ADD234567891 START2            !
+     C                     Z-ADD345678912 START3            !
+     C                     ENDIF                            Endif
+     C*
+     C*          Initialise The Multiplication Factors
+     C                     Z-ADD12        NUMER   20
+     C                     Z-ADD8         DENOM   20
+     C           NUMER     DIV  DENOM     MF      64
+     C*
+     C*          Perform An Initial Spin Of The Wheels
+     C                     EXSR $SPIN1
+     C                     EXSR $SPIN2
+     C                     EXSR $SPIN3
+     C*
+     C*          Initialise The Variables Of The Win Meter
+     C                     Z-ADD1000      CREDIT
+     C                     Z-ADD0         LSTWIN
+     C                     Z-ADD0         CURWIN
+     C                     Z-ADD0         #LBET
+     C*
+     C*          Retrieve The Current System time & Date
+     C*          & Use It To Set The Initial Spin Value
+     C                     TIME           TIMDAT
+     C           STIME     MULT 1000      TEMP    90
+     C           TEMP      ADD  123       TEMP1   90
+     C           TEMP      ADD  234       TEMP2   90
+     C           TEMP      ADD  345       TEMP3   90
+     C**                   Z-ADDTEMP1     START1
+     C**                   Z-ADDTEMP2     START2
+     C**                   Z-ADDTEMP3     START3
+     C*          Uncomment The Above 3 Lines and Comment Out The
+     C*          Below 3 Lines To Set The Same Inital Spin Value
+     C*          Everytime The Program Is Invoked
+     C                     ADD  TEMP1     START1
+     C                     ADD  TEMP2     START2
+     C                     ADD  TEMP3     START3
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************

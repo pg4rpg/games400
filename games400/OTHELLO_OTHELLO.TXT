@@ -1,0 +1,21 @@
+Name:		Othello/400
+
+Author:         Bryan Deitz (bdeitz@3x.com)
+
+Objects:        OTH400PF	Physical File
+		OTH400D         Display file
+                OTH400          RPG/400 Program
+
+To Create:      Compile the physical file OTH400PF first, then the display file
+		OTH400D, and then RPG/400 program OTH400R.
+
+Object:	        To fill the board with as many 'X's as possible by outflanking t
+		Computer's 'O's.
+
+To Start:	CALL OTH400R
+
+Play:		Place the curser in an empty space next to your opponents 'O' and
+		press enter.  There must be an 'X' on the far side of the 'O' (or
+		'O's) that you wish to change.  All of the 'O's between the far
+		'X' and the 'X' you place will be changed to 'X's.
+		Hint:  Controlling the corners is key to winning.

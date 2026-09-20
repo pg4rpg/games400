@@ -1,0 +1,90 @@
+     A**************************************************************
+     A*  X25W  -  SCREEN DDS FOR PROGRAM X25                       *
+     A*                                                            *
+     A**************************************************************
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      CF03(03 'CMD3')
+     A                                      CF05(05 'CMD5')
+     A                                      CF12(12 'CMD12')
+     A                                      HELP
+     A**************************************************************
+     A          R X25W01
+     A            VOLBA          1A  B  1  3CHGINPDFT
+     A                                      CHECK(ER)
+     A                                      DSPATR(ND)
+     A                                  1 20'X25 - move the numbers into right -
+     A                                      order'
+     A                                      DSPATR(HI)
+     A            FLD025         2A  O  8 22
+     A            FLD026         2A  O  8 26
+     A            FLD027         2A  O  8 30
+     A            FLD028         2A  O  8 34
+     A            FLD029         2A  O  8 38
+     A            FLD030         2A  O  9 22
+     A            FLD031         2A  O  9 26
+     A            FLD032         2A  O  9 30
+     A            FLD033         2A  O  9 34
+     A            FLD034         2A  O  9 38
+     A            FLD035         2A  O 10 22
+     A            FLD036         2A  O 10 26
+     A            FLD037         2A  O 10 30
+     A            FLD038         2A  O 10 34
+     A            FLD039         2A  O 10 38
+     A            FLD040         2A  O 11 22
+     A            FLD041         2A  O 11 26
+     A            FLD042         2A  O 11 30
+     A            FLD043         2A  O 11 34
+     A            FLD044         2A  O 11 38
+     A            FLD045         2A  O 12 22
+     A            FLD046         2A  O 12 26
+     A            FLD047         2A  O 12 30
+     A            FLD048         2A  O 12 34
+     A            FLD049         2A  O 12 38
+     A                                 23  2'  F3=End        F5=Restart        -
+     A                                                                Space=Bos-
+     A                                      s key'
+     A            FLD024        75A  O 24  2DSPATR(HI)
+     A                                 21  6'Do not move with the cursor, use n-
+     A                                      umeric keyboard for moving'
+     A                                 14 66'1=Left'
+     A                                 15 66'3=Right'
+     A                                 16 66'5=Up'
+     A                                 17 66'2=Down'
+     A                                 12 63'Moving:'
+     A**************************************************************
+     A          R X25W02
+     A                                  1 27'Work with All Spooled Files'
+     A                                      DSPATR(HI)
+     A                                  3  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A            VOLBA          1A  B  9  3CHGINPDFT
+     A                                      CHECK(ER)
+     A                                  4  4'1=Send   2=Change   3=Hold   4=Del-
+     A                                      ete   5=Display   6=Release   7=Mes-
+     A                                      sages'
+     A                                      COLOR(BLU)
+     A                                  5  4'8=Attributes        9=Work with pr-
+     A                                      inting status'
+     A                                      COLOR(BLU)
+     A                                  7 31'Device or                     Tota-
+     A                                      l     Cur'
+     A                                      DSPATR(HI)
+     A                                  8  2'Opt  File        User        Queue-
+     A                                             User Data   Sts   Pages    P-
+     A                                      age  Copy'
+     A                                      DSPATR(HI)
+     A                                  9  7'QPFCPRTO    QUSER       QPRINT    -
+     A                                                    RDY       5          -
+     A                                         1'
+     A                                 20  2'Parameters for options 1, 2, 3 or -
+     A                                      command'
+     A                                 21  2'===>'
+     A                                 21  7'                                  -
+     A                                                                         -
+     A                                          '
+     A                                      DSPATR(UL)
+     A                                 22  2'F3=Exit   F10=View 3   F11=View 2 -
+     A                                        F12=Cancel   F22=Printers   F24=M-
+     A                                      ore keys'
+     A                                      COLOR(BLU)
+     A**********End of source*************************************************

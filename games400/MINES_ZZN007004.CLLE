@@ -1,0 +1,19 @@
+/* CL program:  ZZn007004                                                     */
+/* Description: Compiles the code uploaded from file n007004.bdl              */
+/*              'Mines'                                                       */
+
+PGM
+
+    MONMSG  CPF0000  EXEC(GOTO ERRPRC)
+
+    CRTDSPF FILE(GAMES400/MINESW) SRCFILE(GAMES400/N007004)
+    MONMSG CPF0000
+
+    CRTCBLPGM PGM(GAMES400/MINES) SRCFILE(GAMES400/N007004) SRCMBR(MINES)
+    MONMSG CPF0000
+
+    RETURN
+
+ERRPRC:
+    DMPCLPGM
+ENDPGM
